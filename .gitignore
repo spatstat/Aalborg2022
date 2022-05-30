@@ -1,0 +1,8 @@
+.Rhistory
+*/.Rhistory
+*/*/.Rhistory
+.Rapp*
+*/.Rapp*
+*/*/.Rapp*
+.Rproj.user
+*~
