@@ -43,6 +43,6 @@ Notes                                       |   Labs                     |  Solu
 ### Information for developers
 
 The `Rmarkdown` source code is available at
-[https://github.com/spatstat/ECAS2022](https://github.com/spatstat/Aalborg2022)
+[https://github.com/spatstat/Aalborg2022](https://github.com/spatstat/Aalborg2022)
 
 **This material is Copyright (C) Jesper Møller, Rasmus Waagepetersen, Jakob Gulddahl Rasmussen, Christophe Biscio, Ege Rubak and Adrian Baddeley 2022**
