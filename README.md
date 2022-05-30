@@ -5,4 +5,4 @@ summer school workshop **Statistics for Point Patterns in Space and Beyond** hel
 
 See the course website for the actual course material:
 
-http://spatstat.org/Aalborg2022/
+https://spatstat.org/Aalborg2022/
