@@ -12,6 +12,18 @@ you will need to have installed the following on your computer:
 * [R](http://r-project.org) (and possibly [Rstudio](http://rstudio.com))
 * the `R` package [spatstat](http://cran.r-project.org/package=spatstat)
 
+### Required preparation for the course
+
+1. If you don't have R and RStudio installed please do so [as described here](https://asta.math.aau.dk/software/R-installation)
+(**note** as described you need to choose a non-standard install option during install on Windows to be sure to avoid problems)
+
+2. Watch this video about using RStudio (feel free to only skim it if you are already RStudio user):
+https://youtu.be/mAtAHwiP204
+
+3. When you have R installed on your own computer, please install `spatstat` and all its dependencies by running this R command in the R console:
+`install.packages("spatstat", dependencies = TRUE)`
+
+
 ### Course materials for day 1 and 2 (lecturers Rasmus Waagepetersen and Ege Rubak)
 
 Days 1 and 2 (Monday and Tuesday) comprises short lectures and software demonstrations followed by "lab" exercises on the computer.
