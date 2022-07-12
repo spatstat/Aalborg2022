@@ -44,8 +44,9 @@ Notes                                       |   Labs                     |  Solu
 
 ### Course materials for day 4 (lecturers Jakob Gulddahl Rasmussen and Jesper Møller)
 
-- [Slides about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/PhDBayes/lecture_networks_no_pause.pdf)
-- [Slides about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/PhDBayes/lecture_spheres_no_pause.pdf)
+- [Slides about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_networks_no_pause.pdf)
+- [Slides about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_spheres_no_pause.pdf)
+- [Review paper](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf)
 - More on the way.
 
 
