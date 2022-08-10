@@ -1,0 +1,202 @@
+---
+title: "Notes for session 1"
+author: "Ege Rubak"
+date: "August 2022"
+output: github_document
+---
+
+## Introduction
+
+```{r, echo=FALSE, message=FALSE}
+library(spatstat)
+```
+
+_Spatial data_= data attributed to spatial locations
+
+Three main types of spatial data:
+
+* _spatial variable ("field")_, eg temperature
+* _regional aggregate data_, eg accident counts in each state
+* _spatial point patterns_, eg locations of crimes/accidents
+
+```{r, echo=FALSE, results="hide", fig.width=9, fig.height=3, out.width="100%"}
+W <- Window(austates)
+f <- function(x,y){ 50+y }
+X <- rpoint(70, f, win=W)
+Z <- scaletointerval(density(X, 3), from=10, to=40)
+agg <- quadratcount(X, tess=austates)
+plot(solist(field=Z, regional=agg, points=X), main="", box=FALSE)
+```
+
+This workshop is about the analysis of _spatial point patterns_
+
+We will use the `spatstat` package in `R`
+
+```{r}
+library(spatstat)
+```
+
+## Spatial point pattern terminology
+
+### Points
+
+The "points" in a point pattern are the spatial locations
+where the events or objects were observed. They are specified
+by spatial coordinates. **NOTE:** In all that follows and for all functions in
+`spatstat` the coordinates are assumed to be **projected coordinates in Euclidean
+space**. Do not analyse geographic coordinates (latitude and longitude) directly
+in `spatstat` -- project them first!
+
+```{r, echo=FALSE, results="hide"}
+xx <- c(0.3, 0.5, 0.7)
+yy <- c(0.3, 0.7, 0.5)
+XX <- ppp(xx, yy, 0:1, 0:1)
+LL <- psp(c(xx[1], xx[1], xx[2], xx[2], xx[3], xx[3]),
+          c(0,     yy[1], 0,     yy[2], 0,     yy[3]),
+	  c(xx[1], 0,     xx[2], 0,     xx[3], 0),
+	  c(yy[1], yy[1], yy[2], yy[2], yy[3], yy[3]),
+	  owin())
+plot(LL, main="", lwd=2, lty=2)
+plot(XX, add=TRUE, pch=16, cex=1.5)
+```
+
+### Window
+
+The window $W$ is the spatial region where
+points were (or could have been) observed.
+
+```{r, echo=FALSE, results="hide"}
+plot(solist(unmark(chorley), Window(chorley)), main="", main.panel="")
+```
+
+### Covariates
+
+Covariates are explanatory variables (which might "explain"
+any spatial variation in the abundance of points, for example).
+
+Many covariates take the form of a function $Z(u), \quad u \in W$
+defined at every spatial location $u$.
+
+```{r, echo=FALSE, results="hide"}
+plot(Z, main="",box=FALSE)
+```
+
+Alternatively, other kinds of spatial data can be treated as
+explanatory data. Usually we need to translate them into spatial functions
+for use in analysis.
+
+### Marks
+
+Marks are attributes of the individual events or things.
+
+In a spatial point pattern of trees, the trees might be classified
+into different species, and each tree carries a mark ("label")
+indicating which species it belongs to.
+
+```{r, echo=FALSE, results="hide"}
+plot(urkiola, main="", cols=2:3)
+```
+
+Marks are methodologically different from covariates:
+marks are part of the "response", not the "
+explanatory variable"
+
+## Software and data 
+
+### Spatstat
+
+```{r}
+library(spatstat)
+```
+
+A point pattern dataset is represented an object belonging to the class
+`"ppp"` (planar point pattern). Some datasets are included in the package:
+
+```{r}
+gordon
+class(gordon)
+```
+
+```{r}
+plot(gordon)
+```
+
+The spatial coordinates of the points can be extracted by
+`as.data.frame`:
+
+```{r}
+head(as.data.frame(gordon))
+```
+
+The window of observation for a point pattern can be extracted by (notice the upper case W in `Window` -- it is important):
+
+```{r}
+W <- Window(gordon)
+W
+class(W)
+```
+
+This is an object of class `"owin"` (observation window)
+representing a spatial region.
+
+If the points also carry _marks_, the marks can be extracted by
+`marks()` or `as.data.frame()`:
+
+```{r}
+hyytiala
+marks(hyytiala)
+```
+
+If the marks are a `factor` (categorical variable) then this specifies
+a classification of the points into different groups.
+
+The marks could also be numeric:
+
+```{r}
+longleaf
+marks(longleaf)
+```
+
+The marks could be multivariate:
+
+```{r}
+finpines
+head(marks(finpines))
+```
+
+Other kinds of spatial objects in `spatstat` include:
+
+* pixel images: class `"im"`
+* spatial patterns of line segments: class `"psp"`
+* spatial tessellations: class `"tess"`
+
+### Wrangling data
+
+In this workshop, we will use datasets which are already
+installed in _spatstat_, because time is short.
+
+In practice, you would need to import your own data into `R`.
+
+Data can be provided in many different file formats
+
+* text file, CSV file
+* shapefile
+* `netcdf` file
+
+The `spatstat` package does not support reading and writing of
+files in different formats. This would be poor software design.
+
+Instead, if you need to read files in a particular format,
+we recommend that you find an appropriate `R` package
+which is designed to read and write
+that specific file format. Once the data have been read into `R`, then
+you can use _another_ `R` package to convert the data into
+objects recognised by `spatstat`. 
+
+It is often enough to use 
+the functions `read.table` and `read.csv` in the base `R` system
+which will read simple text files containing columns of data and
+store them in `R` as a `data.frame`. 
+
+For full details please read the
+[free copy of Chapter 3 the spatstat book](http://book.spatstat.org/sample-chapters/chapter03.pdf)
