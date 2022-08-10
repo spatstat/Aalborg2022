@@ -40,13 +40,18 @@ Notes                                       |   Labs                     |  Solu
 
 ### Course materials for day 3 (lecturer Jakob Gulddahl Rasmussen)
 
-**TBA**
+- [Slides about temporal and spatio-temporal point processes](./notes/spacetime-slides.pdf)
+- [R-code for demonstrating temporal and spatio-temporal point processes](./notes-Rcode.pdf)
+- [Lecture notes on marked temporal point processes](https://arxiv.org/pdf/1806.00221.pdf)
 
 ### Course materials for day 4 (lecturers Jakob Gulddahl Rasmussen and Jesper Møller)
 
+- For the first lecture in day 4, we continue with the slides and R-code from day 3.
 - [Slides about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_networks_no_pause.pdf)
 - [Slides about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_spheres_no_pause.pdf)
 - [Review paper](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf)
+- [Slides about point processes on directed linear networks (Jakob)](./notes/dln-slides.pdf)
+- [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf)
 - More on the way.
 
 
