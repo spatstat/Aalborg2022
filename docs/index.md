@@ -41,7 +41,7 @@ Notes                                       |   Labs                     |  Solu
 ### Course materials for day 3 (lecturer Jakob Gulddahl Rasmussen)
 
 - [Slides about temporal and spatio-temporal point processes](./notes/spacetime-slides.pdf)
-- [R-code for demonstrating temporal and spatio-temporal point processes](./notes-Rcode.R)
+- [R-code for demonstrating temporal and spatio-temporal point processes](./notes/spacetime-Rcode.R)
 - [Lecture notes on marked temporal point processes](https://arxiv.org/pdf/1806.00221.pdf)
 
 ### Course materials for day 4 (lecturers Jakob Gulddahl Rasmussen and Jesper Møller)
