@@ -58,7 +58,7 @@ Solutions for the first three should be send to Rasmus (rw@math.aau.dk) while th
 
 - _One_ of the exercises at slide 11, 17, 33 or 35 in spacetime-slides.pdf should be handed in to Jakob (jgr@math.aau.dk).
 
-### Optional reading
+### Optional reading for Wednesday
 
 This is not required but may be helpful when solving exercises:
 
@@ -87,9 +87,44 @@ This is not required but may be helpful when solving exercises:
 - [Review paper on point processes on linear networks](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf) (third lecture)
 - [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf) (also at [arXiv: 1812.09071](https://arxiv.org/pdf/1812.09071)) (fourth lecture)
 
-## Course materials for day 5 (lecturer Christophe Biscio)
+## Friday (lecturer Christophe Biscio)
 
-**TBA**
+Topological data analysis (TDA) is a new field that aims to use tools from topology to draw information on the "shape" of data. 
+It has in the past years been successfully used in various fields, including in spatial statistics.
+
+However, the mathematical background and theory in TDA are often unfamiliar for most statisticians.
+
+The aim of this session is to give you an informal introduction to TDA, with a clear understanding of its main concepts and mathematical objects.
+
+This will be illustrated with applications in spatial statistics to assess the goodness-of-fit of a point process.
+
+The session will be accompanied by tutorials and exercices with the R package TDA.
+
+### Hand-in exercises for Friday
+
+- Your solution to [this exercise](./notes/TDAexercise.pdf) should be handed in to Christophe (christophe@math.aau.dk).
+
+### Optional reading for Friday
+
+This is not required but may be helpful when solving exercises:
+
+- Articles: 
+    + Biscio, C.A.N., Chenavier N., Hirsch C., Svane A.M. 
+    Testing goodness of fit for point processes via topological data analysis. 
+    Electronic Journal of Statistics, 14, 1024–1074, 2020.
+    + Biscio, C.A.N., Møller, J. 
+    The accumulated persistence function, a new useful functional summary statistic for topological data analysis, with a view to brain artery trees and spatial point process applications. 
+    Journal of Computational and Graphical Statistics, 28, 671–681, 2019.
+
+- Books: 
+    + Tamal K. Dey and Yusu Wang
+    Computational Topology for Data Analysis, Cambridge University Press. 
+    Freely available online: <https://www.cs.purdue.edu/homes/tamaldey/book/CTDAbook/CTDAbook.html>
+    + Herbert Edelsbrunner and John Harer
+    Computational Topology - An Introduction, 
+    American Mathematical Society, Providence, RI. 
+    Freely available online: <https://www.maths.ed.ac.uk/~v1ranick/papers/edelcomp.pdf>
+
 
 ### Information for developers
 
