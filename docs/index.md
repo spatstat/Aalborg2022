@@ -1,6 +1,6 @@
 This is the website for participants in the summer school
 _Statistics for Point Patterns in Space and Beyond_ given by Jesper Møller, Rasmus Waagepetersen, Jakob Gulddahl Rasmussen, Christophe Biscio and Ege Rubak as part of the
-[1st International Summer School for PhD students and other young researchers](https://www.phd.engineering.aau.dk/Summer+School+2022/) in Aalborg, August 22-26 2022.
+[1st International Summer School for PhD Students and Other Young Researchers](https://www.phd.engineering.aau.dk/Summer+School+2022/) in Aalborg, August 22-26 2022.
 
 **Location:** [Aalborg University, Fredrik Bajers Vej 7A room 4-108, DK-9200 Aalborg Ø](https://clients.mapsindoors.com/aau/57482221bc1f570e288b8ef0/details/137e8aba9b244cd89c0bfc65)
 
@@ -8,7 +8,7 @@ _Statistics for Point Patterns in Space and Beyond_ given by Jesper Møller, Ras
 
 To receive a course diploma (4 ECTS) the participants will be evaluated by successful participation during the lectures, including the solution of exercises. 
 For the final assessment, a satisfactory solution of selected exercises (henceforth called hand-in exercises) are required with **deadline September 11, 2022**. 
-The hand-in exercises and to whom they should be sent are listed as part of the description of each day of the workshop below.
+The hand-in exercises and to whom they should be send are listed as part of the description of each day of the workshop below.
 
 ## Required preparation for the course
 
@@ -33,24 +33,24 @@ Each session consists of:
 1. A lecture based on [slides](./notes/lecturesRW.pdf)
 2. Exercises from the slides using "pen and paper"
 3. Software demonstration based on lab notes (see below)
-4. Lab exercises on the computer.
+4. Lab exercises on the computer
 
 **Some links are not active yet.**
 
 Topic | Lab notes | Lab exercises | Lab solutions | Hand-in exercise
 Intro and moments | [Notes 1](./notes/notes01.html) | [Lab 1](./labs/lab01.html) | [Lab solutions 1](./solutions/solution01.html) | Exerc. 1 in Intro sec. of slides
-Poisson and envelopes | [Notes for Session 2](./notes/notes02.html) | [Lab 2](./labs/lab02.html) | [Solutions to Lab 2](./solutions/solution02.html) | Exerc. 2 in Poisson sec. of slides
-Cox/cluster and estimating eqns. | [Notes for Session 3](./notes/notes03.html) | [Lab 3](./labs/lab03.html) | [Solutions to Lab 3](./solutions/solution03.html) | Exerc. 1 in Cox/cluster sec. of slides
-Determinantal and Markov models | [Notes for Session 4](./notes/notes04.html) | [Lab 4](./labs/lab04.html) | [Solutions to Lab 4](./solutions/solution04.html) | Computer exercise [html](./notes/dpp_exercise.html),[pdf](./notes/dpp_exercise.pdf),[Rmd](./notes/dpp_exercise.Rmd)
+Poisson and envelopes | [Notes 2](./notes/notes02.html) | [Lab 2](./labs/lab02.html) | [Lab solutions 2](./solutions/solution02.html) | Exerc. 2 in Poisson sec. of slides
+Cox/cluster and estimating eqns. | [Notes 3](./notes/notes03.html) | [Lab 3](./labs/lab03.html) | [Lab solutions 3](./solutions/solution03.html) | Exerc. 1 in Cox/cluster sec. of slides
+Determinantal and Markov models | [Notes 4](./notes/notes04.html) | [Lab 4](./labs/lab04.html) | [Lab solutions 4](./solutions/solution04.html) | Computer exercise [html](./notes/dpp_exercise.html),[pdf](./notes/dpp_exercise.pdf),[Rmd](./notes/dpp_exercise.Rmd)
 
 ### Hand-in exercises for Monday and Tuesday
 
 Hand-in exercises are listed in the table above. 
-Solutions for the first three should be sent to Rasmus (rw@math.aau.dk) while the solution to the computer exercise should be sent to Ege (rubak@math.aau.dk).
+Solutions for the first three should be send to Rasmus (rw@math.aau.dk) while the solution to the computer exercise should be send to Ege (rubak@math.aau.dk).
 
 ## Wednesday (lecturer Jakob Gulddahl Rasmussen)
 
-- [Slides about temporal and spatio-temporal point processes](./notes/spacetime-slides.pdf)
+- [Slides (spacetime-slides.pdf) about temporal and spatio-temporal point processes](./notes/spacetime-slides.pdf)
 - [R-code for demonstrating temporal and spatio-temporal point processes](./notes/spacetime-Rcode.R)
 
 ### Hand-in exercises for Wednesday
@@ -65,10 +65,12 @@ This is not required but may be helpful when solving exercises:
 
 ## Thursday (lecturers Jakob Gulddahl Rasmussen and Jesper Møller)
 
-- For the first lecture in day 4, we continue with the slides and R-code from day 3.
-- [Slides about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_networks_no_pause.pdf)
-- [Slides about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_spheres_no_pause.pdf)
-- [Slides about point processes on directed linear networks (Jakob)](./notes/dln-slides.pdf)
+Thursday consists of four lectures
+
+- For the first lecture, we continue with the slides and R-code from day 3 (Jakob).
+- Second lecture: [Slides (lecture_networks_no_pause.pdf) about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_networks_no_pause.pdf)
+- Third lecture: [Slides (lecture_spheres_no_pause.pdf) about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_spheres_no_pause.pdf)
+- Fourth lecture: [Slides (dln-slides.pdf) about point processes on directed linear networks (Jakob)](./notes/dln-slides.pdf)
 
 ### Hand-in exercises for Thursday
 
