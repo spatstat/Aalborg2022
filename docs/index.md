@@ -1,18 +1,18 @@
 This is the website for participants in the summer school
 _Statistics for Point Patterns in Space and Beyond_ given by Jesper Møller, Rasmus Waagepetersen, Jakob Gulddahl Rasmussen, Christophe Biscio and Ege Rubak as part of the
-[1st international summer school for PhD students and other young researchers](https://www.phd.engineering.aau.dk/Summer+School+2022/) in Aalborg, August 22-26 2022.
+[1st International Summer School for PhD students and other young researchers](https://www.phd.engineering.aau.dk/Summer+School+2022/) in Aalborg, August 22-26 2022.
 
 **Location:** [Aalborg University, Fredrik Bajers Vej 7A room 4-108, DK-9200 Aalborg Ø](https://clients.mapsindoors.com/aau/57482221bc1f570e288b8ef0/details/137e8aba9b244cd89c0bfc65)
 
 ## Getting credit for the course
 
 To receive a course diploma (4 ECTS) the participants will be evaluated by successful participation during the lectures, including the solution of exercises. 
-For the final assessment, a satisfactory solution of selected exercises are required with deadline September 11, 2022. 
-The hand-in exercises are listed as part of the description of each day of the workshop below.
+For the final assessment, a satisfactory solution of selected exercises (henceforth called hand-in exercises) are required with **deadline September 11, 2022**. 
+The hand-in exercises and to whom they should be sent are listed as part of the description of each day of the workshop below.
 
 ## Required preparation for the course
 
-You will need a working install of R (and RStudio) with the package spatstat to participate, so please follow.
+You will need a working install of R (and RStudio) with the package spatstat to participate, so please go through these steps:
 
 1. If you don't have [R](http://r-project.org) (mandatory) and [Rstudio](http://rstudio.com) (optional, but highly recommended) installed please do so [as described here](https://asta.math.aau.dk/software/R-installation)
 (**note** as described you need to choose a non-standard install option for R during install on Windows to be sure to avoid problems)
@@ -24,9 +24,10 @@ https://youtu.be/mAtAHwiP204
 `install.packages("spatstat", dependencies = TRUE)`
 
 
-## Course materials for day 1 and 2 (lecturers Rasmus Waagepetersen and Ege Rubak)
+## Monday and Tuesday (lecturers Rasmus Waagepetersen and Ege Rubak)
 
-Days 1 and 2 (Monday and Tuesday) are divided into a morning and afternoon session for a total of four sessions during the first two days. 
+These days are divided into a morning and afternoon session for a total of four sessions.
+
 Each session consists of:
 
 1. A lecture based on [slides](./notes/lecturesRW.pdf)
@@ -42,31 +43,49 @@ Poisson and envelopes | [Notes for Session 2](./notes/notes02.html) | [Lab 2](./
 Cox/cluster and estimating eqns. | [Notes for Session 3](./notes/notes03.html) | [Lab 3](./labs/lab03.html) | [Solutions to Lab 3](./solutions/solution03.html) | Exerc. 1 in Cox/cluster sec. of slides
 Determinantal and Markov models | [Notes for Session 4](./notes/notes04.html) | [Lab 4](./labs/lab04.html) | [Solutions to Lab 4](./solutions/solution04.html) | Computer exercise [html](./notes/dpp_exercise.html),[pdf](./notes/dpp_exercise.pdf),[Rmd](./notes/dpp_exercise.Rmd)
 
-### Hand-in exercises
+### Hand-in exercises for Monday and Tuesday
 
 Hand-in exercises are listed in the table above. 
 Solutions for the first three should be sent to Rasmus (rw@math.aau.dk) while the solution to the computer exercise should be sent to Ege (rubak@math.aau.dk).
 
-## Course materials for day 3 (lecturer Jakob Gulddahl Rasmussen)
+## Wednesday (lecturer Jakob Gulddahl Rasmussen)
 
 - [Slides about temporal and spatio-temporal point processes](./notes/spacetime-slides.pdf)
 - [R-code for demonstrating temporal and spatio-temporal point processes](./notes/spacetime-Rcode.R)
+
+### Hand-in exercises for Wednesday
+
+- _One_ of the exercises at slide 11, 17, 33 or 35 in spacetime-slides.pdf should be handed in to Jakob (jgr@math.aau.dk).
+
+### Optional reading
+
+This is not required but may be helpful when solving exercises:
+
 - [Lecture notes on marked temporal point processes](https://arxiv.org/pdf/1806.00221.pdf)
 
-## Course materials for day 4 (lecturers Jakob Gulddahl Rasmussen and Jesper Møller)
+## Thursday (lecturers Jakob Gulddahl Rasmussen and Jesper Møller)
 
 - For the first lecture in day 4, we continue with the slides and R-code from day 3.
 - [Slides about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_networks_no_pause.pdf)
 - [Slides about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_spheres_no_pause.pdf)
-- [Review paper](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf)
 - [Slides about point processes on directed linear networks (Jakob)](./notes/dln-slides.pdf)
-- [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf)
 
+### Hand-in exercises for Thursday
+
+- _One_ of the exercises at slide 11, 18, 19, 30 or 43 in lecture_spheres_no_pause.pdf should be handed in to Jesper (jm@math.aau.dk).
+- _One_ of the exercises at slide 20 or 43 in lecture_networks_no_pause.pdf should be handed in to Jesper (jm@math.aau.dk).
+- _One_ of the exercises at slide 5, 10 or 15 in dln-slides.pdf should be handed in to Jakob (jgr@math.aau.dk).
+
+### Optional reading
+
+This is not required but may be helpful when solving exercises:
+
+- [Review paper](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf)
+- [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf)
 
 ## Course materials for day 5 (lecturer Christophe Biscio)
 
 **TBA**
-
 
 ### Information for developers
 
