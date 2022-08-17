@@ -9,6 +9,7 @@ _Statistics for Point Patterns in Space and Beyond_ given by Jesper Møller, Ras
 To receive a course diploma (4 ECTS) the participants will be evaluated by successful participation during the lectures, including the solution of exercises. 
 For the final assessment, a satisfactory solution of selected exercises (henceforth called hand-in exercises) are required with **deadline September 11, 2022**. 
 The hand-in exercises and to whom they should be send are listed as part of the description of each day of the workshop below.
+Please write your name clearly on the handin exactly as it appears on PhD Moodle, so we can easily cross reference with the participant list.
 
 ## Required preparation for the course
 
@@ -30,7 +31,7 @@ These days are divided into a morning and afternoon session for a total of four 
 
 Each session consists of:
 
-1. A lecture based on [slides](./notes/lecturesRW.pdf)
+1. A lecture based on the same [slide set](./notes/lecturesRW.pdf) for all sessions
 2. Exercises from the slides using "pen and paper"
 3. Software demonstration based on lab notes (see below)
 4. Lab exercises on the computer
@@ -67,10 +68,10 @@ This is not required but may be helpful when solving exercises:
 
 Thursday consists of four lectures
 
-- For the first lecture, we continue with the slides and R-code from day 3 (Jakob).
-- Second lecture: [Slides (lecture_networks_no_pause.pdf) about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_networks_no_pause.pdf)
-- Third lecture: [Slides (lecture_spheres_no_pause.pdf) about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_spheres_no_pause.pdf)
-- Fourth lecture: [Slides (dln-slides.pdf) about point processes on directed linear networks (Jakob)](./notes/dln-slides.pdf)
+- First lecture: We continue with the slides and R-code from day 3 (Jakob).
+- Second lecture: [Slides (lecture_networks_no_pause.pdf) about point processes on linear networks (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_networks_no_pause.pdf).
+- Third lecture: [Slides (lecture_spheres_no_pause.pdf) about point processes on the sphere (Jesper)](https://people.math.aau.dk/~jm/courses/SummerSchool2022/lecture_spheres_no_pause.pdf).
+- Fourth lecture: [Slides (dln-slides.pdf) about point processes on directed linear networks (Jakob)](./notes/dln-slides.pdf).
 
 ### Hand-in exercises for Thursday
 
@@ -78,13 +79,13 @@ Thursday consists of four lectures
 - _One_ of the exercises at slide 20 or 43 in lecture_networks_no_pause.pdf should be handed in to Jesper (jm@math.aau.dk).
 - _One_ of the exercises at slide 5, 10 or 15 in dln-slides.pdf should be handed in to Jakob (jgr@math.aau.dk).
 
-### Optional reading
+### Optional reading for Thursday
 
 This is not required but may be helpful when solving exercises:
 
-- [Review paper](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf)
-- [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf) (also at [arXiv: 1812.09071](https://arxiv.org/pdf/1812.09071))
-- [Paper on log Gaussian Cox processes on the sphere](https://arxiv.org/pdf/1803.03051)
+- [Paper on log Gaussian Cox processes on the sphere](https://arxiv.org/pdf/1803.03051) (second lecture)
+- [Review paper on point processes on linear networks](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf) (third lecture)
+- [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf) (also at [arXiv: 1812.09071](https://arxiv.org/pdf/1812.09071)) (fourth lecture)
 
 ## Course materials for day 5 (lecturer Christophe Biscio)
 
