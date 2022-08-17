@@ -81,7 +81,8 @@ This is not required but may be helpful when solving exercises:
 This is not required but may be helpful when solving exercises:
 
 - [Review paper](https://people.math.aau.dk/~jm/courses/SummerSchool2022/sjs.pdf)
-- [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf)
+- [Paper on point processes on directed linear network](https://link.springer.com/content/pdf/10.1007/s11009-020-09777-y.pdf) (also at [arXiv: 1812.09071](https://arxiv.org/pdf/1812.09071))
+- [Paper on log Gaussian Cox processes on the sphere](https://arxiv.org/pdf/1803.03051)
 
 ## Course materials for day 5 (lecturer Christophe Biscio)
 
@@ -89,7 +90,7 @@ This is not required but may be helpful when solving exercises:
 
 ### Information for developers
 
-The `Rmarkdown` source code is available at
+The `Rmarkdown` source code for some parts is available at
 [https://github.com/spatstat/Aalborg2022](https://github.com/spatstat/Aalborg2022)
 
 **This material is Copyright (C) Jesper Møller, Rasmus Waagepetersen, Jakob Gulddahl Rasmussen, Christophe Biscio, Ege Rubak and Adrian Baddeley 2022**
