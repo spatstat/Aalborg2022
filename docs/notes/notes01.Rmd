@@ -1,13 +1,16 @@
 ---
 title: "Notes for session 1"
-author: "Ege Rubak"
+author: "Ege Rubak (and Adrian Baddeley)"
 date: "August 2022"
 output: github_document
 ---
 
 ## Introduction
 
-```{r, echo=FALSE, message=FALSE}
+In this workshop we will use the `spatstat` package in `R` 
+(actually `spatstat` is an umbrella for a collection of packages):
+
+```{r}
 library(spatstat)
 ```
 
@@ -28,13 +31,7 @@ agg <- quadratcount(X, tess=austates)
 plot(solist(field=Z, regional=agg, points=X), main="", box=FALSE)
 ```
 
-This workshop is about the analysis of _spatial point patterns_
-
-We will use the `spatstat` package in `R`
-
-```{r}
-library(spatstat)
-```
+This workshop is about the analysis of _spatial point patterns_, and this is also the main focus of the `spatstat` package.
 
 ## Spatial point pattern terminology
 
@@ -45,7 +42,7 @@ where the events or objects were observed. They are specified
 by spatial coordinates. **NOTE:** In all that follows and for all functions in
 `spatstat` the coordinates are assumed to be **projected coordinates in Euclidean
 space**. Do not analyse geographic coordinates (latitude and longitude) directly
-in `spatstat` -- project them first!
+in `spatstat` -- project them first! (Using e.g. the `sf` package.)
 
 ```{r, echo=FALSE, results="hide"}
 xx <- c(0.3, 0.5, 0.7)
@@ -104,10 +101,6 @@ explanatory variable"
 ## Software and data 
 
 ### Spatstat
-
-```{r}
-library(spatstat)
-```
 
 A point pattern dataset is represented an object belonging to the class
 `"ppp"` (planar point pattern). Some datasets are included in the package:
@@ -191,7 +184,7 @@ we recommend that you find an appropriate `R` package
 which is designed to read and write
 that specific file format. Once the data have been read into `R`, then
 you can use _another_ `R` package to convert the data into
-objects recognised by `spatstat`. 
+objects recognised by `spatstat`. (Package `sf` is recommended.)
 
 It is often enough to use 
 the functions `read.table` and `read.csv` in the base `R` system
@@ -200,3 +193,274 @@ store them in `R` as a `data.frame`.
 
 For full details please read the
 [free copy of Chapter 3 the spatstat book](http://book.spatstat.org/sample-chapters/chapter03.pdf)
+
+# Intensity
+
+Often the main objective is to study
+the "density" of points in the point pattern
+and to investigate any spatial variation in this density.
+
+```{r, echo=FALSE, results='hide'}
+library(spatstat)
+```
+
+## Point processes
+
+In a statistical approach to data analysis, we think of the observed data
+as the outcome of a random process.
+
+To analyse spatial point pattern data, we will regard the
+observed _point pattern_ $x$ as a realisation
+of a random *point process* $X$.
+
+It is helpful to visualise a point process as a collection ("ensemble")
+of many different possible outcomes. Here is one example:
+
+```{r, echo=FALSE, results="hide", out.width="100%"}
+f <- function(x,y) ifelse(x + y < 1, 20, 100)
+YY <- rpoispp(f, nsim=16)
+plot(YY, main="", main.panel="")
+```
+
+# Intensity
+
+The _intensity_ of a point process is the expected number of points
+per unit area. It may be a constant $\lambda \ge 0$,
+or it may be spatially varying.
+
+Intensity is an average, over all possible outcomes of the point process.
+We can visualise it by superimposing the ensemble of outcomes:
+
+```{r, echo=FALSE, results="hide"}
+YYY <- do.call(superimpose, unname(YY))
+plot(YYY, main="")
+```
+
+We will usually assume that the point process has an
+_intensity function_ $\lambda(u)$ defined at every spatial location $u$.
+Then $\lambda(u)$ is the spatially-varying expected number of points
+per unit area. It is formally defined to satisfy
+$$ E[ n(B \cap X) ] = \int_B \lambda(u) \, {\rm d}u $$
+for any region $B \subset R^2$,
+where $n(B \cap X)$ denotes the number of points falling in $B$.
+
+Intensity is closely related to probability density.
+If $X$ is a point process with intensity function $\lambda(u)$,
+then each individual point inside $W$ has probability density
+$f(u) = \lambda(u)/\Lambda_W$, where
+$\Lambda_W = \int_W \lambda(u) \, {\rm d}u$.
+
+## Nonparametric estimation
+
+Because of the close relationship between intensity and
+probability density, methods for nonparametric estimation of the intensity
+function are very similar to methods for density estimation.
+
+### Nonparametric estimation of spatially-varying intensity
+
+Given a point pattern $x = \{ x_1, \ldots, x_n \}$ in a window $W$
+the kernel estimate of intensity is
+$$
+   \widehat\lambda(u) = \sum_{i=1}^n k(u - x_i) e(u, x_i)
+$$
+where $k(x)$ is the smoothing kernel and $e(u, v)$ is a correction for
+edge effects.
+
+```{r}
+library(spatstat)
+plot(japanesepines)
+Z <- density(japanesepines, sigma=0.1)
+plot(Z)
+```
+
+The command in `spatstat` to compute the kernel estimate of intensity
+is `density.ppp`, a method for the generic function `density`. 
+
+The argument `sigma` is the bandwidth of the smoothing kernel.
+
+```{r, fig.height=3, fig.width=12, out.width='100%', echo=FALSE}
+plot(solist(data=japanesepines,
+             "sigma=0.05"=density(japanesepines, 0.05),
+             "sigma=0.1"=density(japanesepines, 0.1),
+             "sigma=0.2"=density(japanesepines, 0.2)),
+	      main="", nrows=1)
+```
+
+Bandwidth can be selected automatically:
+
+```{r}
+bw.ppl(japanesepines)
+bw.CvL(japanesepines)
+bw.diggle(japanesepines)
+bw.scott(japanesepines)
+```
+
+### Nonparametric estimation of spatially-varying, mark-dependent intensity
+
+A marked point pattern, with marks which are categorical values,
+effectively classifies the points into different types.
+
+```{r}
+mucosa
+plot(mucosa, cols=c(2,3))
+```
+
+Extract the sub-patterns of points of each type:
+
+```{r}
+M <- split(mucosa)
+M
+class(M)
+plot(M)
+```
+
+Apply kernel smoothing to each sub-pattern
+using `density.splitppp`:
+
+```{r}
+B <- density(M, sigma=bw.ppl)
+B
+plot(B)
+```
+
+Suppose $\lambda_i(u)$ is the intensity function of the points
+of type $i$, for $i=1,2,\ldots,m$.
+The intensity function of all points regardless of type is
+$$ \lambda_{\bullet}(u) = \sum_{i=1}^m \lambda_i(u). $$
+Under reasonable assumptions,
+the probability that a random point at location $u$ belongs to type $i$ is
+$$
+   p_i(u) = \frac{\lambda_i(u)}{\lambda_{\bullet}(u)}.
+$$
+We could calculate this by hand in `spatstat`:
+
+```{r}
+lambdaECL <- B[["ECL"]]
+lambdaOther <- B[["other"]]
+lambdaDot <- lambdaECL + lambdaOther
+pECL <- lambdaECL/lambdaDot
+pOther <- lambdaOther/lambdaDot
+plot(pECL)
+```
+
+These calculations are automated in the function `relrisk` (relative risk):
+
+```{r, fig.height=3, fig.width=7, result.width='100%'}
+V <- relrisk(mucosa, bw.ppl, casecontrol=FALSE)
+plot(V, main="")
+```
+
+Bandwidth selection for the ratio is different
+from bandwidth selection for the intensity. We recommend using
+the special algorithm `bw.relrisk`:
+
+```{r, fig.height=3, fig.width=7, result.width='100%'}
+bw.relrisk(mucosa)
+Vr <- relrisk(mucosa, bw.relrisk, casecontrol=FALSE)
+plot(Vr, main="")
+```
+
+
+### Segregation of types
+
+"Segregation" occurs if the probability distribution of types of points
+is spatially varying.
+
+A Monte Carlo test of segregation can be performed using the nonparametric
+estimators described above. The function `segregation.test` performs it.
+
+```{r}
+segregation.test(mucosa, sigma=0.15, verbose=FALSE)
+```
+
+The principle of a Monte Carlo test is:
+
+1. Generate $m$ simulations under the null hypothesis
+2. Calculate the same statistic $T$ for the data and the simulations
+3. Conclude based on the rank (extremeness) of the observed statistic for data
+
+Under the null hypothesis the distribution of $t_\text{obs},t_1,\dots,t_m$ is exchangeable and the probability that the data statistic $t_\text{obs}$ is most extreme under a one-sided alternative is 1/(m+1).
+So a one-sided test with $m=19$ corresponds to significance level $\alpha=0.05$.
+
+More generally the p-values for larger, smaller or two-sided alternatives is:
+$$p_{+} = \frac{1 + \sum_{j=1}^m \mathbf{1}\{t_j \ge t_\text{obs}\}}{m+1}$$
+$$p_{-} = \frac{1 + \sum_{j=1}^m \mathbf{1}\{t_j \le t_\text{obs}\}}{m+1}$$
+$$p  = 2 \min\{ p_{+}, \, p_{-} \}$$
+
+From the help file of `segregation.test()`:
+
+> The Monte Carlo test of spatial segregation of types,
+> proposed by Kelsall and Diggle (1995)
+> and Diggle et al (2005), is applied to the point pattern \code{X}.
+> The test statistic is
+> $$
+>   T = \sum_i \sum_m \left( \widehat p(m \mid x_i) - \overline p_m
+>   \right)^2
+> $$
+> where $\widehat p(m \mid x_i)$ is the
+> leave-one-out kernel smoothing estimate of the probability that the
+> $i$-th data point has type $m$, and
+> $\overline p_m$ is the average fraction of data points
+> which are of type $m$.
+> The statistic $T$ is evaluated for the data and
+> for `nsim` randomised versions of `X`, generated by
+> randomly permuting or resampling the marks.
+> 
+> Note that, by default, automatic bandwidth selection will be
+> performed separately for each randomised pattern. This computation
+> can be very time-consuming but is necessary for the test to be
+> valid in most conditions. A short-cut is to specify the value of
+> the smoothing bandwidth \code{sigma} as shown in the examples.
+
+### Nonparametric estimation of intensity depending on a covariate
+
+In some applications we believe that the intensity depends on a spatial
+covariate $Z$, in the form
+$$
+    \lambda(u) = \rho(Z(u))
+$$
+where $\rho(z)$ is an unknown function which we want to estimate.
+A nonparametric estimator of $\rho$ is
+$$
+\hat\rho(z) = \frac{\sum_{i=1}^n k(Z(x_i) - z)}{\int_W k(Z(u) - z) \, {\rm d} u}
+$$
+where $k()$ is a one-dimensional smoothing kernel. This is computed by
+`rhohat`.
+
+*Example*: mucosa data, enterochromaffin-like cells (ECL)
+
+```{r}
+E <- split(mucosa)$ECL
+plot(E)
+```
+
+The wall of the gut is at the bottom of the picture.
+Cell density appears to decline as we go further away from the wall.
+Use the string `"y"` to refer to the $y$ coordinate:
+
+```{r}
+g <- rhohat(E, "y")
+plot(g)
+```
+
+*Example*: Murchison gold survey.
+
+```{r, fig.height=4, fig.width=10, result.width='100%'}
+X <- murchison$gold
+L <- murchison$faults
+X <- rescale(X, 1000, "km")
+L <- rescale(L, 1000, "km")
+D <- distfun(L)
+plot(solist(gold=X, faults=L, distance=D), main="", equal.scales=TRUE)
+```
+
+Gold deposits are frequently found near a geological fault line.
+Here we converted the fault line pattern into a spatial covariate
+$$
+    D(u) = \mbox{ distance from } u \mbox{ to nearest fault }
+$$
+
+```{r}
+h <- rhohat(X, D)
+plot(h, xlim = c(0, 20))
+```
