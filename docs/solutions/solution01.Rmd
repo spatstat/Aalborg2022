@@ -1,0 +1,322 @@
+---
+title: 'Lab 1: Introduction -- solution'
+---
+
+```{r, include = FALSE}
+# This option turns evaluation of R code off in this document. Remove it
+# if you use it as a template for solving the lab exercise.
+knitr::opts_chunk$set(eval = TRUE)
+```
+
+If you have not already done so, you’ll need to start R and load the `spatstat`
+package by typing
+```{r, message=FALSE}
+library(spatstat)
+```
+
+### Exercise 1
+We will study a dataset that records the locations of Ponderosa Pine
+trees (*Pinus ponderosa*) in a study region in the
+Klamath National Forest in northern California. The data are
+included with `spatstat` as the dataset `ponderosa`.
+
+1.  assign the data to a shorter name, like `X` or `P`;
+
+    To assign the data to `X` we simply write:
+    
+    ```{r}
+    X <- ponderosa
+    ```
+
+2.  plot the data;
+
+    To plot the data we do the following:
+    
+    ```{r}
+    plot(X)
+    ```
+
+    By the S3 method dispatch, this calls the `plot.ppp` function.
+    The `chars` argument indicate that the point type should be be periods ("`.`").
+
+3.  find out how many trees are recorded;
+
+    Both `npoints` and `print.ppp` displays the number of recorded trees:
+
+    ```{r}
+    npoints(X)
+    print(X)
+    ```
+    
+    I.e. there are 108 trees in the dataset.
+
+4.  find the dimensions of the study region;
+
+    The dimensions of the observation window can be seen above. Alternatively, it
+    can be directly assesed via
+
+    ```{r}
+    Window(X)
+    ```
+
+5.  obtain an estimate of the average intensity of trees (number of
+    trees per unit area).
+
+    The average intensity can be computed via `intensity.ppp`
+    
+    ```{r}
+    intensity(X)
+    ```
+
+    or the more expansive `summary.ppp`:
+    
+    ```{r}
+    summary(X)
+    ```
+
+### Exercise 2
+
+The Ponderosa data, continued:
+
+1.  When you type `plot(ponderosa)`, the command that is
+    actually executed is `plot.ppp`, the plot method for
+    point patterns. Read the help file for the function
+    `plot.ppp`, and find out which argument to the
+    function can be used to control the main title for the plot;
+
+    From the documentation, the argument that controls the title is `main` as is 
+    also the case in the regular generic `plot`.
+
+2.  plot the Ponderosa data with the title *Ponderosa Pine
+    Trees* above it;
+  
+    ```{r}
+    plot(ponderosa, main = "Ponderosa Pine Trees")
+    ```
+
+3.  from your reading of the help file, predict what will happen if
+    we type
+    ```{r, eval = FALSE}
+    plot(ponderosa, chars="X", cols="green")
+    ```
+    then check that your guess was correct;
+    
+    Each point will be plotted as an green "X" and indeed:
+    
+    ```{r}
+    plot(ponderosa, chars="X", cols="green")
+    ```
+
+4.  try different values of the argument `chars`, for
+    example, one of the integers 0 to 25, or a letter of the
+    alphabet. (Note the difference between `chars=3` and
+    `chars="+"`, and the difference between `chars=4` and
+    `chars="X"`).
+
+    There are subtle differences in the actual character/point types plotted.
+    When given a string literal, the actual character is plotted as the point type.
+
+    ```{r}
+    plot(ponderosa, chars=3, cols="green")
+    plot(ponderosa, chars="+", cols="green")
+    plot(ponderosa, chars=4, cols="green")
+    plot(ponderosa, chars="X", cols="green")
+    ```
+
+### Exercise 3
+
+The dataset `japanesepines` contains the locations of
+Japanese Black Pine trees in a study region.
+
+1.  Plot the `japanesepines` data.
+
+    We use the generic `plot` function which is dispatched to `plot.ppp`:
+    
+    ```{r}
+    plot(japanesepines)
+    ```
+
+2.  What is the average intensity (the average number of points
+    per unit area?
+
+    The average intensity can be computed via `intensity.ppp`:
+    
+    ```{r}
+    intensity(japanesepines)
+    ```
+
+3.  Using `density.ppp`, compute a kernel estimate of the
+    spatially-varying intensity function for the Japanese pines
+    data, using a Gaussian kernel with standard deviation
+    $\sigma=0.1$ units, and store the estimated intensity in an
+    object `D` say.
+
+    From the documentation (`?density.ppp`) we see that the following will work:
+    
+    ```{r}
+    D <- density(japanesepines, sigma = 0.1)
+    ```
+
+4.  Plot a colour image of the kernel estimate `D`.
+
+    The plotting of the colour image is automatically done by dispatched call to
+    the `plot.im` method by calling `plot` on the `im` object.
+
+    ```{r}
+    plot(D, main = "")
+    ```
+
+5.  Most plotting commands will accept the argument
+    `add=TRUE` and interpret it to mean that the plot
+    should be drawn over the existing display, without clearing the
+    screen beforehand. Use this to plot
+    a colour image of the kernel estimate `D` with
+    the original Japanese Pines data superimposed.
+
+    We can use the `add = TRUE` functionality of the plotting methods.
+    
+    ```{r}
+    plot(D, main = "")
+    plot(japanesepines, add = TRUE, cols = "white", cex = 0.5, pch = 16)
+    ```
+
+6.  Plot the kernel estimate without the ‘colour ribbon’.
+
+    From `help("plot.im")` we see that `ribbon = FALSE` disables the colour key:
+    ```{r}
+    plot(D, main = "", ribbon = FALSE)
+    plot(japanesepines, add = TRUE, cols = "white", cex = 0.5, pch = 16)
+    ```
+
+7.  Try the following command
+    ```{r}
+    persp(D, theta=70, phi=25, shade=0.4)
+    ```
+    and find the documentation for the arguments `theta`,
+    `phi` and `shade`.
+
+    It dispatches to `persp.im`, but these arguments are then passed down to
+    `persp.default` through the dots (`...`).
+    From the documentation of `persp.default` they are "angles defining the
+    viewing direction. `theta` gives the azimuthal direction and `phi` the
+    colatitude."
+    The `shade` controls the shading of the surface facets.
+
+    ```{r}
+    persp(D, theta=70, phi=25, shade=0.4, main = "")
+    ```
+
+7.  Find the maximum and minimum values of the intensity estimate
+    over the study region. (Hint: Use `summary` or `range`)
+    
+    ```{r}
+    range(D)
+    ```
+
+8.  The kernel estimate of intensity is defined so that its integral
+    over the entire study region is equal to the number of points in
+    the data pattern, ignoring edge effects. Check whether this is
+    approximately true in this example. (Hint: use `integral`)
+    
+    Calling `integral.im` we see that the integral is close to the
+    observed number of points `r npoints(japanesepines)`:
+    
+    ```{r}
+    round(integral(D))
+    ```
+
+### Exercise 4
+
+The dataset `hamster` is a multitype pattern representing
+the locations of cells of two types, *dividing* and *pyknotic*.
+
+1.  plot the pattern;
+
+    ```{r}
+    plot(hamster, main = "")
+    ```
+
+
+2.  plot the pattern again, changing the colours and symbols
+    used to represent the two types of cells;
+
+    ```{r}
+    plot(hamster, main = "", cols = c("red", "blue"), chars = c(3, 5))
+    ```
+
+3.  plot the patterns of pyknotic and dividing cells separately
+    using `plot(split(hamster))`.
+
+    ```{r}
+    plot(split(hamster), main = "")
+    ```
+
+3.  use `relrisk` to perform cross-validated bandwidth
+    selection and computation of the relative intensity of pyknotic
+    cells.
+
+    ```{r}
+    plot(relrisk(hamster, hmax = 1, relative = TRUE, control = "dividing"))
+    ```
+
+### Exercise 5
+
+The `bei` dataset gives the locations of trees in a survey area with additional
+covariate information in a list `bei.extra`.
+
+1.  Assign the elevation covariate to a variable `elev` by typing
+    ```{r}
+    elev <- bei.extra$elev
+    ```
+
+2.  Plot the trees on top of an image of the elevation covariate.
+    ```{r}
+    plot(elev)
+    plot(bei, add = TRUE, col = "black")
+    ```
+
+3.  Assume that the intensity of trees is a function $\lambda(u) = \rho(e(u))$
+    where $e(u)$ is the terrain elevation at location u.
+    Compute a nonparametric estimate of the function $\rho$ and plot it by
+    ```{r}
+    rh <- rhohat(bei, elev)
+    plot(rh)
+    ```
+
+4.  Compute the predicted intensity based on this estimate of $\rho$.
+    
+    ```{r}
+    prh <- predict(rh)
+    plot(prh, main = "")
+    plot(bei, add = TRUE, cols = "white", cex = .2, pch = 16)
+    ```
+
+5.  Compute a non-parametric estimate of intensity by kernel smoothing, and
+  	compare with the predicted intensity above.
+
+    The kernel density estimate of the points is computed and plotted with the
+    following code:
+    
+    ```{r}
+    dbei <- density(bei, sigma = bw.scott)
+    plot(dbei, main = "")
+    plot(bei, add = TRUE, cols = "white", cex = .2, pch = 16)
+    ```
+    
+    Which seems to be quite different form the predicted intentisty.
+
+6.  Bonus info: To plot the two intensity estimates next to each
+  	other you collect the estimates as a spatial object list
+  	(`solist`) and plot the result (the estimates are called
+  	`pred` and `ker` below):
+    ```{r eval=FALSE}
+    l <- solist(pred, ker)
+    plot(l, equal.ribbon = TRUE, main = "", 
+         main.panel = c("rhohat prediction", "kernel smoothing"))
+    ```
+
+    ```{r}
+    l <- solist(prh, dbei)
+    plot(l, equal.ribbon = TRUE, main = "",
+         main.panel = c("rhohat prediction", "kernel smoothing"))
+    ```

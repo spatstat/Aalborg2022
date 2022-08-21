@@ -1,0 +1,153 @@
+---
+title: 'Lab 1: Introduction'
+---
+
+```{r, include = FALSE}
+# This option turns evaluation of R code off in this document. Remove it
+# if you use it as a template for solving the lab exercise.
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+If you have not already done so, you’ll need to start R and load the `spatstat`
+package by typing
+```{r, message=FALSE}
+library(spatstat)
+```
+
+### Exercise 1
+
+We will study a dataset that records the locations of Ponderosa Pine
+trees (_Pinus ponderosa_) in a study region in the
+Klamath National Forest in northern California. The data are
+included with `spatstat` as the dataset `ponderosa`.
+
+1.  assign the data to a shorter name, like `X` or `P`;
+
+2.  plot the data;
+
+3.  find out how many trees are recorded;
+
+4.  find the dimensions of the study region;
+
+5.  obtain an estimate of the average intensity of trees (number of
+    trees per unit area).
+
+### Exercise 2
+
+The Ponderosa data, continued:
+
+1.  When you type `plot(ponderosa)`, the command that is
+    actually executed is `plot.ppp`, the plot method for
+    point patterns. Read the help file for the function
+    `plot.ppp`, and find out which argument to the
+    function can be used to control the main title for the plot;
+
+2.  plot the Ponderosa data with the title *Ponderosa Pine
+    Trees* above it;
+
+3.  from your reading of the help file, predict what will happen if
+    we type
+    ```{r, eval=FALSE}
+    plot(ponderosa, chars="X", cols="green")
+    ```
+    then check that your guess was correct;
+
+4.  try different values of the argument `chars`, for
+    example, one of the integers 0 to 25, or a letter of the
+    alphabet. (Note the difference between `chars=3` and
+    `chars="+"`, and the difference between `chars=4` and
+    `chars="X"`).
+
+### Exercise 3
+
+The dataset `japanesepines` contains the locations of
+Japanese Black Pine trees in a study region.
+
+1.  Plot the `japanesepines` data.
+
+2.  What is the average intensity (the average number of points
+    per unit area?
+
+3.  Using `density.ppp`, compute a kernel estimate of the
+    spatially-varying intensity function for the Japanese pines
+    data, using a Gaussian kernel with standard deviation
+    $\sigma=0.1$ units, and store the estimated intensity in an
+    object `D` say.
+
+4.  Plot a colour image of the kernel estimate `D`.
+
+5.  Most plotting commands will accept the argument
+    `add=TRUE` and interpret it to mean that the plot
+    should be drawn over the existing display, without clearing the
+    screen beforehand. Use this to plot
+    a colour image of the kernel estimate `D` with
+    the original Japanese Pines data superimposed.
+
+6.  Plot the kernel estimate without the ‘colour ribbon’.
+
+7.  Try the following command
+    ```{r}
+    persp(D, theta=70, phi=25, shade=0.4)
+    ```
+    and find the documentation for the arguments `theta`,
+    `phi` and `shade`.
+
+7.  Find the maximum and minimum values of the intensity estimate
+    over the study region. (Hint: Use `summary` or `range`)
+
+8.  The kernel estimate of intensity is defined so that its integral
+    over the entire study region is equal to the number of points in
+    the data pattern, ignoring edge effects. Check whether this is
+    approximately true in this example. (Hint: use `integral`)
+
+### Exercise 4
+
+The dataset `hamster` is a multitype pattern representing
+the locations of cells of two types, *dividing* and *pyknotic*.
+
+1.  plot the pattern;
+
+2.  plot the pattern again, changing the colours and symbols
+    used to represent the two types of cells;
+
+3.  plot the patterns of pyknotic and dividing cells separately
+    using `plot(split(hamster))`.
+
+4.  use `relrisk` to perform cross-validated bandwidth
+    selection and computation of the relative intensity of pyknotic
+    cells.
+
+### Exercise 5
+
+The `bei` dataset gives the locations of trees in a survey area with additional
+covariate information in a list `bei.extra`.
+
+1.  Assign the elevation covariate to a variable `elev` by typing
+    ```{r}
+    elev <- bei.extra$elev
+    ```
+
+2.  Plot the trees on top of an image of the elevation covariate.
+
+3.  Assume that the intensity of trees is a function $\lambda(u) = \rho(e(u))$
+    where $e(u)$ is the terrain elevation at location u.
+    Compute a nonparametric estimate of the function $\rho$ and plot it by
+    ```{r}
+    rh <- rhohat(bei, elev)
+    plot(rh)
+    ```
+
+4.  Compute the predicted intensity based on this estimate of $\rho$.
+
+5.  Compute a non-parametric estimate of intensity by kernel smoothing, and
+  	compare with the predicted intensity above.
+
+6.  Bonus info: To plot the two intensity estimates next to each
+  	other you collect the estimates as a spatial object list
+  	(`solist`) and plot the result (the estimates are called
+  	`pred` and `ker` below):
+    ```{r}
+    l <- solist(pred, ker)
+    plot(l, equal.ribbon = TRUE, main = "", 
+         main.panel = c("rhohat prediction", "kernel smoothing"))
+    ```
