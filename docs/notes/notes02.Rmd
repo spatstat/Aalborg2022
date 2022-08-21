@@ -1,0 +1,375 @@
+---
+title: "Notes for session 2"
+author: "Ege Rubak (and Adrian Baddeley)"
+date: "August 2022"
+output: html_document
+---
+
+```{r include=FALSE}
+library(spatstat)
+```
+
+## Parametric modelling of intensity
+
+We can formulate a parametric model for the intensity 
+and fit it to the point pattern data, using the `spatstat`
+function `ppm` (point process model). 
+
+In its simplest form, `ppm` fits a _Poisson point process model_
+to the point pattern data.
+
+### Poisson point process
+
+The _homogeneous Poisson process_ with intensity $\lambda > 0$
+in two-dimensional space is characterised by the following properties:
+
+* for any region $B$, the random number $n(X \cap B)$ of points falling in $B$
+follows a Poisson distribution;
+* for any region $B$, the expected number of points falling in $B$
+is $E[n(X \cap B)] = \lambda \, \mbox{area}(B)$;
+* for any region $B$, given that $n(X \cap B) = n$, the
+$n$ points are independent and uniformly distributed inside $B$;
+* for any _disjoint_ regions $B_1,\ldots, B_m$, the
+numbers $n(X \cap B_1), \ldots, n(X \cap B_m)$ of points falling in each
+region are independent random variables.
+
+Here are some realisations of the homogeneous Poisson process with
+intensity 100 (points per unit area):
+
+```{r, result.width='100%'}
+plot(rpoispp(100, nsim=12), main="", main.panel="")
+```
+
+The *inhomogeneous* Poisson process with intensity *function* $\lambda(u)$
+is characterised by the following properties:
+
+* for any region $B$, the random number $n(X \cap B)$ of points falling in $B$
+follows a Poisson distribution;
+* for any region $B$, the expected number of points falling in $B$ is
+$$
+  E[n(X \cap B)] = \int_B \lambda(u) \, {\rm d}u;
+$$
+* for any region $B$, given that $n(X \cap B) = n$, the
+$n$ points are independent and *identically* distributed inside $B$
+with probability density $f(u)= \lambda(u)/\Lambda$,
+where $\Lambda = \int_B \lambda(u) \, {\rm d}u$;
+* for any _disjoint_ regions $B_1,\ldots, B_m$, the
+numbers $n(X \cap B_1), \ldots, n(X \cap B_m)$ of points falling in each
+region are independent random variables.
+
+Here are some realisations of the inhomogeneous Poisson process with
+intensity function $\lambda((x,y)) = 100 x$ on the unit square $[0,1]^2$ (why is this important?):
+
+```{r, result.width='100%'}
+lam <- function(x,y) { 100 * x}
+plot(rpoispp(lam, nsim=12), main="", main.panel="")
+```
+
+### Loglinear model for intensity
+
+`ppm` can fit a _Poisson point process model_
+to the point pattern data by maximum likelihood.
+
+A Poisson point process is completely specified by its
+intensity function. So the procedure for formulating a Poisson model
+is simply to write a mathematical expression for the intensity function.
+
+In `ppm` the intensity is assumed to be a
+**loglinear** function of the **parameters**. That is,
+$$\log\lambda(u) = \beta_1 Z_1(u) + \ldots + \beta_p Z_p(u)$$
+where $\beta_1, \ldots, \beta_p$ are parameters to be estimated,
+and $Z_1, \ldots, Z_p$ are spatial covariates.
+
+To fit this model to a point pattern dataset `X`, we type
+```{r, eval=FALSE}
+ppm(X ~ Z1 + Z2 + .. Zp)
+```
+where `Z1, Z2, ..., Zp` are pixel images or functions.
+
+Important notes:
+
+ 1. The model is expressed in terms of the **log** of the intensity.
+
+ 2. The covariates $Z_1(u), \ldots, Z_p(u)$ 
+    (called the "canonical covariates") can be anything;
+    they are not necessarily the same as the original variables
+    that we were given; they could be transformations and combinations
+    of the original variables.
+
+### Fit by maximum likelihood
+
+The Poisson process
+with intensity function $\lambda_\theta(u)$, controlled by a parameter
+vector $\theta$, has log-likelihood
+$$
+    \log L(\theta) = \sum_{i=1}^n \log \lambda_\theta(x_i)
+                    - \int_W \lambda_\theta(u) \, {\rm d} u.
+$$
+The value of $\theta$ which maximises $\log L(\theta)$ is
+taken as the parameter estimate $\hat\theta$.
+
+From $\hat\theta$ we can compute the
+fitted intensity $\hat\lambda(u) = \lambda_{\hat\theta}(u)$
+and hence we can generate simulated realisations.
+
+Using the likelihood we are able to compute confidence intervals,
+perform analysis of deviance, conduct hypothesis tests, etc.
+
+*Example*: Murchison gold data
+
+Using the Murchison data from before,
+
+```{r}
+X <- murchison$gold
+L <- murchison$faults
+X <- rescale(X, 1000, "km")
+L <- rescale(L, 1000, "km")
+D <- distfun(L)
+fit <- ppm(X ~ D)
+```
+
+The formula implies that the model is
+$$\log\lambda(u) = \beta_0 + \beta_1 D(u)$$
+where $D(u)$ is the distance covariate (distance from location $u$
+to nearest geological fault) and $\beta_0, \beta_1$ are the
+regression coefficients. In other words, the model says that
+the intensity of gold deposits is an exponentially decreasing
+function of distance from the nearest fault.
+
+The result of `ppm` is a fitted model object of class `"ppm"`.
+There are many methods for this class:
+
+```{r}
+fit
+coef(fit)
+confint(fit)
+anova(fit, test="Chi")
+plot(predict(fit))
+```
+
+```{r, result.width='100%'}
+plot(simulate(fit, drop=TRUE))
+plot(L, add=TRUE, col=3)
+```
+
+To visualise the intensity of the model as a function
+of one of the covariates, we can use the command `effectfun`:
+
+```{r}
+plot(effectfun(fit, "D"), xlim=c(0, 20))
+```
+
+### Intensity depending on marks
+
+In a _multi-type_ point pattern
+the points have marks which are categorical values:
+
+```{r}
+mucosa
+plot(mucosa, cols=c(2,3))
+```
+
+We can fit a Poisson model in which the intensity depends on the
+type of point, using the variable name `marks` in the model formula.
+
+```{r}
+model0 <- ppm(mucosa ~ marks)
+model0
+coef(model0)
+plot(predict(model0), equal.ribbon=TRUE)
+```
+
+In the formula, the `marks` variable is a categorical variable.
+The effect of the model formula `mucosa ~ marks` 
+is to estimate a different intensity for each level, that is,
+a different intensity for each type of point. The model formula
+`mucosa ~ marks` is equivalent to saying that the intensity of the
+points of type $i$ is
+$$
+    \lambda_i(u) = \alpha_i
+$$
+for each $i = 1, 2, \ldots$ where $\alpha_1, \alpha_2, \ldots$ are
+the different constant intensities to be estimated.
+The actual printed output will depend on the convention for handling
+_"contrasts"_ in linear models. 
+
+The `marks` variable can be combined with other explanatory variables (names `x` and `y` refer to the cartesian coordinates):
+
+```{r}
+model1 <- ppm(mucosa ~ marks + y)
+model1
+coef(model1)
+plot(predict(model1))
+```
+
+The model formula `~marks + y` states that
+$$
+   \log \lambda_i((x,y)) = \gamma_i  + \beta y
+$$
+where $\gamma_1, \gamma_2, \ldots$ and $\beta$ are
+parameters. That is, the dependence on the $y$ coordinate
+has the same "slope" coefficient $\beta$ for each type of point,
+but different types of points have different abundance overall.
+
+```{r}
+plot(effectfun(model1, "y", marks="other"), log(.y) ~ .x, ylim=c(4,8), col=2, main="")
+plot(effectfun(model1, "y", marks="ECL"), add=TRUE, col=3, log(.y) ~ .x)
+legend("bottomleft", lwd=c(1,1), col=c(2,3), legend=c("other", "ECL"))
+```
+
+```{r}
+model2 <- ppm(mucosa ~ marks * y)
+model2
+coef(model2)
+plot(predict(model2))
+```
+
+The model formula `~marks * y` states that
+$$
+   \log \lambda_i((x,y)) = \gamma_i  + \beta_i y
+$$
+where $\gamma_1, \gamma_2, \ldots$ and $\beta_1,\beta_2, \ldots$ are
+parameters. The intensity may
+depend on the $y$ coordinate in a completely different way
+for different types of points.
+
+```{r}
+plot(effectfun(model2, "y", marks="other"), log(.y) ~ .x, col=2, ylim=c(2,8), main="")
+plot(effectfun(model2, "y", marks="ECL"), add=TRUE, col=3, log(.y) ~ .x)
+legend("bottomleft", lwd=c(1,1), col=c(2,3), legend=c("other", "ECL"))
+```
+
+### Parametric estimation of spatially-varying probability
+
+When we have fitted a point process model to a multi-type
+point pattern, we can compute 
+ratios of the intensities of different types.
+This is automated in _relrisk.ppm_:
+
+```{r}
+plot(relrisk(model2, casecontrol=FALSE))
+```
+
+### Parametric test for segregation
+
+One way to test for segregation is to compare two models,
+with the null model stating that there is no segregation:
+
+```{r}
+nullmodel <- ppm(mucosa ~ marks + polynom(x, y, 2))
+altmodel <- ppm(mucosa ~ marks * polynom(x, y, 2))
+anova(nullmodel, altmodel, test="Chi")
+```
+
+## Checking for dependence between points
+
+Example of Poisson model for `bei` data:
+```{r}
+bei_model <- ppm(bei ~ grad, data = bei.extra)
+coef(summary(bei_model))
+```
+
+Are the points clustering more than expected only from dependence on `grad`?
+
+```{r}
+Kbei_model <- Kinhom(bei, lambda = bei_model, correction = "border")
+```
+
+```{r warning=FALSE}
+plot(Kbei_model)
+```
+
+Often central $L$-function is used:
+
+```{r warning=FALSE}
+plot(Kbei_model, sqrt(./pi)-r ~ r)
+```
+
+### Pointwise significance envelopes
+
+Monte Carlo significance envelopes for a **pointwise** test:
+
+```{r warning=FALSE}
+e <- envelope(bei_model, fun = Linhom, correction = "border", nsim = 99,
+              savefuns = TRUE, savepatterns = TRUE)
+```
+
+```{r}
+plot(e, .-r~r, ylim = c(-5, 20))
+```
+
+Above the 99 simulations from the fitted Poisson model are generated. 
+Then `Linhom()` for these and the data using leave-one-out KDE for `lambda`.
+It may be more appropriate to use the intensity model (log-linear dependence on `grad`), but this is much slower. 
+The command (not executed) is (without saving intermediate data):
+```{r eval=FALSE}
+envelope(bei_model, fun = Linhom, correction = "border", nsim = 99, lambda = bei_model)
+```
+
+It may be tempting to use the faster:
+```{r eval=FALSE}
+lam <- predict(bei_model, at = "points")
+envelope(bei_model, fun = Linhom, correction = "border", nsim = 99, lambda = lam)
+```
+
+**But this is wrong** due to violation of symmetry principle between data and simulations.
+There is still another worry about the composite hypothesis, where we have used data to estimate the parameters of the model.
+
+### Simple global envelopes
+
+Adding `global = TRUE` and setting `ginterval` gives us simple global *fixed width* envelopes:
+```{r}
+e_global <- envelope(e, global = TRUE, ginterval = c(0,125))
+```
+
+```{r}
+plot(e_global, .-r~r)
+```
+
+### Global rank envelopes
+
+More sophisticated global envelopes are available in the R package `GET` (see references therein for details).
+```{r}
+library(GET)
+```
+
+These envelopes are calculated based on a global ranking of the data curve in the set of curves calculated from simulations and data.
+Each curve has a global rank based on the most extreme pointwise rank it has acheived.
+Many curves typically have the same rank so ties need to be broken which can be done in various ways.
+Due to the ties many simulations are recommended (e.g. 1999).
+The package `GET` can reuse `envelope` objects from `spatstat` if intermediate calculations (simulations and function values) have been saved:
+```{r}
+bei_test <- global_envelope_test(e)
+```
+
+```{r}
+plot(bei_test)
+```
+
+The test both gives a p-value and a graphical interpretation significance envelopes at the $\alpha$-level.
+If the data curve ever exits these envelopes the test is significant at the $\alpha$-level (and vice-versa). 
+Values leading to the rejection of the null hypothesis (at the default $\alpha=0.05$ level) are marked by red.
+
+An example from the package vignettes testing a simple hypothesis:
+```{r}
+X <- unmark(spruces)
+plot(X, main = "")
+```
+
+```{r}
+nsim <- 1999 # Number of simulations
+env <- envelope(X, fun = "Lest", nsim = nsim,
+                savefuns = TRUE, # save the functions
+                correction = "translate", # edge correction for L
+                transform = expression(.-r), # centering
+                simulate = expression(runifpoint(ex = X)), # Simulate CSR
+                verbose = FALSE)
+res <- global_envelope_test(env, type = "erl")
+plot(res)
+```
+
+```{r}
+cset <- crop_curves(env, r_min = 1, r_max = 7)
+res <- global_envelope_test(cset, type = "erl")
+plot(res)
+```
