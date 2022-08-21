@@ -1,0 +1,390 @@
+---
+title: 'Lab 2: Poisson models -- solutions'
+---
+
+```{r, include = FALSE}
+# This option turns evaluation of R code off in this document. Remove it
+# if you use it as a template for solving the lab exercise.
+knitr::opts_chunk$set(eval = TRUE)
+```
+
+```{r, message=FALSE}
+library(spatstat)
+```
+
+
+### Exercise 1
+
+The command `rpoispp(100)` generates realisations of the
+Poisson process with intensity $\lambda = 100$ in the unit square.
+
+1.  Repeat the command `plot(rpoispp(100))` several times
+    to build your intuition about the appearance of a completely
+    random pattern of points.
+
+    Let's plot it three times:
+    
+    ```{r, results='hide'}
+    replicate(3, plot(rpoispp(lambda = 100), main = ""))
+    ``` 
+
+    As can be seen, the points (unsurprisingly) are much more random that want one 
+    might think. "Randomly" drawing points on a piece of paper one would usually
+    draw a point pattern that is more regular (i.e. the points are repulsive).
+
+2.  Try the same thing with intensity $\lambda = 1.5$.
+
+    For brevity we only do it once here:
+    
+    ```{r, results='hide'}
+    plot(rpoispp(lambda = 1.5), main = "")
+    ``` 
+
+    Here we expect 1.5 points in the plot each time.
+
+
+### Exercise 2
+
+Returning to the Japanese Pines data,
+
+1.  Fit the uniform Poisson point process model to the Japanese
+    Pines data
+    ```{r, eval = FALSE}
+    ppm(japanesepines~1)
+    ```
+
+    We fit the Poisson process model with the given command and print the output:
+    
+    ```{r}
+    m.jp <- ppm(japanesepines ~ 1)
+    print(m.jp)
+    ```
+
+2.  Read off the fitted intensity. Check that this is the correct
+    value of the maximum likelihood estimate of the intensity.
+
+    We extract the coeficient with the `coef` function, and compare to the
+    straightforward estimate obtained by `intensity``:
+
+    ```{r}
+    unname(exp(coef(m.jp)))
+    intensity(japanesepines)
+    ```
+
+    As seen, they agree exactly.
+
+### Exercise 3
+
+The `japanesepines` dataset is believed to exhibit
+spatial inhomogeneity.
+
+1.  Plot a kernel smoothed intensity estimate.
+
+    Plot the kernel smoothed intensity estimate selecting the bandwidth with `bw.scott`:
+    
+    ```{r}
+    jp.dens <- density(japanesepines, sigma = bw.scott)
+    plot(jp.dens)
+    plot(japanesepines, col = "white", cex = .4, pch = 16, add = TRUE)
+    ```
+
+2.  Fit the Poisson point process models with loglinear intensity
+    (trend formula `~x+y`) and log-quadratic intensity (trend
+    formula `~polynom(x,y,2)`) to the Japanese Pines data.
+
+    We fit the two models with `ppm`:
+    
+    ```{r}
+    jp.m <- ppm(japanesepines ~ x + y)
+    jp.m2 <- ppm(japanesepines ~ polynom(x, y, 2) )
+    ```
+
+3.  extract the fitted coefficients for these models using
+    `coef`.
+        
+    ```{r}
+    coef(jp.m)
+    coef(jp.m2)
+    ```
+    
+4.  Plot the fitted model intensity (using `plot(predict(fit))`)
+
+    ```{r}
+    par(mar=rep(0,4))
+    plot(predict(jp.m), main = "")
+    plot(predict(jp.m, se=TRUE)$se, main = "")
+    
+    plot(predict(jp.m2), main = "")
+    plot(predict(jp.m2, se=TRUE)$se, main = "")
+    ```
+
+5.  perform the Likelihood Ratio Test for the null hypothesis of a
+    loglinear intensity against the alternative of a log-quadratic
+    intensity, using `anova`.
+
+    ```{r}
+    anova(jp.m, jp.m2)
+    ```
+
+6.  Generate 10 simulated realisations of the fitted log-quadratic
+    model, and plot them, using `plot(simulate(fit, nsim=10))` where 
+    `fit` is the fitted model.
+
+    ```{r}
+    par(mar=rep(0.5,4))
+    plot(simulate(jp.m2, nsim=10), main = "")
+    ```
+
+### Exercise 4
+
+The `bei` dataset gives the locations of trees in a survey area
+with additional covariate information in a list `bei.extra`.
+
+1.  Fit a Poisson point process model to the data which assumes
+    that the intensity is a loglinear function of terrain slope
+    and elevation (hint: use `data = bei.extra` in `ppm`).
+
+    We fit the log-linear intensity model with the following:
+    
+    ```{r}
+    bei.m <- ppm(bei ~ elev + grad, data = bei.extra)
+    ```
+
+2.  Read off the fitted coefficients and write down the fitted
+    intensity function.
+
+    The coefficents are extraced with `coef`:
+    
+    ```{r}
+    coef(bei.m)
+    ```
+
+    Hence the model is $log\lambda(u) = -8.55 + 0.02\cdot E(u) + 5.84 G(u)$ where
+    $E(u)$ and $G(u)$ is the elevation and gradient, respectively, at $u$.
+
+3.  Plot the fitted intensity as a colour image.
+
+    ```{r}
+    plot(predict(bei.m), main = "")
+    plot(bei, cex = 0.3, pch = 16, cols = "white", add = TRUE)
+    ```
+
+4.  extract the estimated variance-covariance matrix of the
+    coefficient estimates, using `vcov`.
+
+    We call `vcov` on the fitted model object:
+    ```{r}
+    vcov(bei.m)
+    ```
+
+5.  Compute and plot the standard error of the intensity estimate
+    (see `help(predict.ppm)`).
+
+    From the documentation the argument `se` will trigger the computation of the 
+    standard errors. These are then plotted in the standard manner.
+    
+    ```{r}
+    std.err <- predict(bei.m, se = TRUE)$se
+    plot(std.err, main = "")
+    ```
+
+### Exercise 5
+
+The dataset `ants` is a multitype point pattern representing the
+locations of nests of two species of ants.
+
+1.  plot the data.
+
+    ```{r}
+    plot(ants)
+    ```
+
+2.  Fit the model `ppm(ants ~ marks)` and interpret the result.
+    Compare the result with `summary(ants)` and explain
+    the similarities.
+
+    ```{r}
+    fit1 <- ppm(ants ~ marks)
+    ```
+    
+    This is a Poisson model with a separate constant intensity for each mark. The
+    fitted intensities are:
+    ```{r}
+    exp(coef(fit1)[1])
+    exp(coef(fit1)[1] + coef(fit1)[2])
+    ```
+
+    This agrees perfectly with the output of `summary(ants)`:
+    ```{r}
+    summary(ants)
+    ```
+
+
+3.  Fit the model `ppm(ants ~ marks + x)` and write down an
+    expression for the fitted intensity function.
+
+    ```{r}
+    fit2 <- ppm(ants ~ marks + x)
+    (co <- coef(fit2))
+    ```
+    
+    Intensity for the reference type (Cataglyphis):
+    
+    $$\lambda( (x,y) ) = \exp(`r co[["(Intercept)"]]` + `r co[["x"]]` \cdot x)$$
+
+    Intensity for the other type (Messor):
+
+    $$\lambda( (x,y) ) = \exp(`r co[["(Intercept)"]]` + `r co[["marksMessor"]]` + `r co[["x"]]` \cdot x)$$
+
+
+4.  Fit the model `ppm(ants ~ marks * x)` and write down an
+    expression for the fitted intensity function.
+
+    ```{r}
+    fit3 <- ppm(ants ~ marks * x)
+    (co <- coef(fit3))
+    ```
+    
+    Intensity for the reference type (Cataglyphis):
+    
+    $$\lambda( (x,y) ) = \exp(`r co[["(Intercept)"]]` + `r co[["x"]]` \cdot x)$$
+    
+    Intensity for the other type (Messor):
+
+    $$\lambda( (x,y) ) = \exp(`r co[["(Intercept)"]]` + `r co[["marksMessor"]]` + (`r co[["x"]]` + `r co[["marksMessor"]]`) \cdot x)$$
+
+5.  Compute the fitted intensities of the three models fitted above 
+    using `predict` and plot the results.
+
+    ```{r}
+    pred <- c(predict(fit1), predict(fit2), predict(fit3))
+    plot(as.solist(pred), ncols = 2, main = "")
+    ```
+
+6.  Explain the difference between the models fitted by
+    `ppm(ants ~ marks + x)` and `ppm(ants ~ marks * x)` .
+
+    For the additive model the effect of the `x` coordinate is the same for both types
+    of ants, while the effect of `x` differs in the multiplicative model.
+
+## Exercise 6
+
+The study region for the ants’ nests data `ants` is
+divided into areas of "scrub" and "field". We want to fit a Poisson
+model with different intensities in the field and scrub areas.
+
+The coordinates of two points on the boundary line between field and
+scrub are given in `ants.extra$fieldscrub`. First construct a function that
+determines which side of the line we are on:
+
+```{r}
+fs <- function(x,y) {
+  ends <- ants.extra$fieldscrub
+  angle <- atan(diff(ends$y)/diff(ends$x))
+  normal <- angle + pi/2
+  project <- (x - ends$x[1]) * cos(normal) + (y - ends$y[1]) * sin(normal)
+  factor(ifelse(project > 0, "scrub", "field"))
+}
+```
+
+Now fit the models:
+```{r, eval=FALSE}
+ppm(ants ~ marks + side, data = list(side=fs))
+ppm(ants ~ marks * side, data = list(side=fs))
+```
+and interpret the results.
+
+```{r}
+fit1 <- ppm(ants ~ marks + side, data = list(side=fs))
+fit2 <- ppm(ants ~ marks * side, data = list(side=fs))
+```
+
+In the first model the fitted intensity is lower in the scrub than in the field
+(but this effect is not significant).
+
+In the second model the fitted intensity of Cataglyphis is lower in the scrub
+than the intensity of Cataglyphis in the field, where as it is the other way
+around for Messor. When we allow for the different effect between ant types the
+scrub/field covariate is significant.
+
+### Exercise 7
+
+The `update` command can be used to re-fit a point
+process model using a different model formula.
+
+1.  Type the following commands and interpret the results:
+    ```{r}
+    fit0 <- ppm(japanesepines ~ 1)
+    fit1 <- update(fit0, . ~ x)
+    fit1
+    fit2 <- update(fit1, . ~ . + y)
+    fit2
+    ```
+
+    OK, let's do that:
+    
+    ```{r}
+    fit0 <- ppm(japanesepines ~ 1)
+    fit1 <- update(fit0, . ~ x)
+    fit1
+    fit2 <- update(fit1, . ~ . + y)
+    fit2
+    ```
+
+2.  Now type `step(fit2)` and interpret the results.
+
+    The backwards selection is done with the code:
+    
+    ```{r}
+    step(fit2)
+    ```
+    
+    First, given two models the preferred model is the one with the minimum AIC 
+    value. In step 1, the removal of x results in the least AIC and is hence 
+    deleted. In step 2, removing y results in a lower AIC than not deleing anything 
+    and is thus deleted. This results in the constant model.
+    
+### Exercise 8
+
+Fit Poisson point process models to the Japanese Pines data, with
+the following trend formulas. Read off an expression for the fitted
+intensity function in each case.
+
+|Trend formula     |Fitted intensity function                   |
+|:-----------------|:-------------------------------------------|
+|`~1`              | $\log\lambda(u) = 4.17$                    |
+|`~x`              | $\log\lambda(u) = 4.28 - 0.23x$            |
+|`~sin(x)`         | $\log\lambda(u) = 4.29 - 0.26\sin(x)$      |
+|`~x+y`            | $\log\lambda(u) = 4.07 - 0.23x + 0.42y$    | 
+|`~polynom(x,y,2)` | $\log\lambda(u) = 4.06 + 1.14x - 1.56y - 0.75x^2 - 1.20xy + 2.51y^2$ |
+|`~factor(x < 0.4)`| $\log\lambda(u) = 4.10 + 0.16\cdot I(x < 0.4)$ |
+
+(Here, $I(\cdot)$ denote the indicator function.)
+
+The fitted intensity functions have been written into the table based on the follwing model fits:
+
+```{r}
+coef(ppm1 <- ppm(japanesepines ~ 1)) 
+coef(ppm2 <- ppm(japanesepines ~ x))
+coef(ppm3 <- ppm(japanesepines ~ sin(x)))
+coef(ppm4 <- ppm(japanesepines ~ x + y))
+coef(ppm5 <- ppm(japanesepines ~ polynom(x, y, 2)))
+coef(ppm6 <- ppm(japanesepines ~ factor(x < 0.4)))
+```
+
+### Exercise 9
+
+Make image plots of the fitted intensities for the inhomogeneous
+models above.
+
+Again, we use `plot(predict())`:
+
+```{r}
+plot(predict(ppm1), main = "")
+plot(predict(ppm2), main = "")
+plot(predict(ppm3), main = "")
+plot(predict(ppm4), main = "")
+plot(predict(ppm5), main = "")
+plot(predict(ppm6), main = "")
+```
+
