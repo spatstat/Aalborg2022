@@ -40,7 +40,7 @@ Topic | Lab notes | Lab exercises | Lab solutions | Hand-in exercise
 Intro and moments | [Notes 1](./notes/notes01.html) | [Lab 1](./labs/lab01.html) | [Lab solutions 1](./solutions/solution01.html) | Exerc. 1 in Intro sec. of slides
 Poisson and envelopes | [Notes 2](./notes/notes02.html) | [Lab 2](./labs/lab02.html) | [Lab solutions 2](./solutions/solution02.html) | Exerc. 2 in Poisson sec. of slides
 Cox/cluster and estimating eqns. | [Notes 3](./notes/notes03.html) | [Lab 3](./labs/lab03.html) | [Lab solutions 3](./solutions/solution03.html) | Exerc. 1 in Cox/cluster sec. of slides
-Determinantal and Markov models | [Notes 4](./notes/notes04.html) | [Lab 4](./labs/lab04.html) | [Lab solutions 4](./solutions/solution04.html) | Computer exercise [html](./notes/dpp_exercise.html),[pdf](./notes/dpp_exercise.pdf),[Rmd](./notes/dpp_exercise.Rmd)
+Determinantal and Markov models | [Notes 4](./notes/notes04.html) | [Lab 4](./labs/lab04.html) | [Lab solutions 4](./solutions/solution04.html) | Computer exercise [html](./labs/dpp_exercise.html),[pdf](./labs/dpp_exercise.pdf),[Rmd](./labs/dpp_exercise.Rmd)
 
 *Additional [slides about determinantal point processes](./notes/DPP_Ege.pdf) for session 4.*
 
