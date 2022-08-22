@@ -1,0 +1,235 @@
+---
+title: 'Lab 3: Dependence -- solution'
+---
+
+```{r, include = FALSE}
+# This option turns evaluation of R code off in this document. Remove it
+# if you use it as a template for solving the lab exercise.
+knitr::opts_chunk$set(eval = TRUE)
+```
+
+```{r, message=FALSE}
+library(spatstat)
+```
+
+### Exercise 1
+
+The `swedishpines` dataset was recorded in a study plot
+in a large forest. We shall assume the pattern is stationary.
+
+1.  Calculate the estimate of the $K$-function using `Kest`.
+
+    The estimation is done with:
+    
+    ```{r}
+    K <- Kest(swedishpines)
+    ```
+
+2.  Plot the estimate of $K(r)$ against $r$
+
+    To plot the K-function, we do:
+    
+    ```{r, results='hide'}
+    plot(K, main = "K-function")
+    ```
+
+3.  Plot the estimate of $K(r) - \pi\!r^2$ against $r$ (Hint: look at the `fmla`
+    argument in `plot.fv`).
+
+    The estimated K-function subtracted $\pi\!r^2$ can be done via the `fmla`
+    (formula) interface:
+
+    ```{r}
+    plot(K, . - pi*r^2 ~ r, main = "Normalized K-function",
+         legendpos = "bottomright")
+    ```
+    
+4.  Calculate and plot an estimate of the pair correlation function
+    using `pcf`.
+  
+    The pair-correlation is also compute straight-forwardly:
+    
+    ```{r}
+    pcorf <- pcf(swedishpines)
+    plot(pcorf)
+    ```
+
+5.  Draw tentative conclusions from these plots about interpoint
+    interaction in the data.
+
+    Assuming a homogeneous point pattern, both the L- and K-function are less
+    what is expected under the Poisson process the data. Thus they indicate a
+    comparatively regular point pattern. Similarly, the pair-correlation
+    function also suggests this.
+
+### Exercise 2
+
+The command `rThomas` generates simulated realisations of
+the Thomas model (‘modified Thomas cluster process’).
+
+1.  Read the help file.
+
+    See `help("rThomas")`.
+
+2.  Type `plot(rThomas(10, 0.05, 8))` a few times, and
+    interpret the results.
+
+    ```{r results="hide"}
+    replicate(3, plot(rThomas(10, 0.05, 8), main = ""))
+    ```
+
+    A clustered process -- on average 10 clusters with 8 points. The standard
+    deviation of the cluster distribution is 0.05, so most points will be within
+    distance 0.10 from their parent.
+
+3.  Experiment with the arguments of `rThomas` to obtain
+    point patterns that
+    
+    i.  consist of a few, well-separated, very tight clusters of
+        points;
+        
+    ii. look similar to realisations of a uniform Poisson process.
+
+    We get few clusters by reducing the intensity of the parent process (first argument).
+    Tightly and separated clusters are obtained by reducing the standard deviation
+    (second argument).
+
+    ```{r}
+    plot(rThomas(5, scale = 0.01, mu = 8), main = "")
+    ```
+
+    If the are many clusters with a large standard deviation it looks like Poisson.
+
+    ```{r}
+    plot(rThomas(100, scale = 1, mu = 1), main = "")
+    ```
+
+### Exercise 3
+
+1.  Read the help file for `kppm`.
+
+    See `help("kppm")`.
+
+2.  Fit the Thomas model to the `redwood` data by the
+    method of minimum contrast:
+    ```{r, eval=FALSE}
+    fit <- kppm(redwood ~ 1, clusters="Thomas")
+    fit
+    plot(fit)
+    ```
+
+    From the documentation, the minmum contrast fitting procedure is default.
+    Hence, we need not specify it.
+
+    ```{r}
+    fit <- kppm(redwood ~ 1, clusters = "Thomas")
+    fit
+    plot(fit, main = "", pause = FALSE) 
+    ```
+
+3.  Read off the parameters of the fitted model, and generate a
+    simulated realisation of the fitted model using `rThomas`.
+
+    From the previous output, we can read off the parameters to do the simulation
+    (or we can use `parameters` to extract them):
+
+    ```{r}
+    (p <- parameters(fit))
+    rt2 <- rThomas(kappa = p$kappa, scale = p$scale, mu = p$mu)
+    plot(rt2, main = "")
+    ```
+
+4.  Type `plot(simulate(fit))` to generate a simulated realisation
+    of the fitted model automatically.
+
+    OK, let try that alternative:
+    
+    ```{r}
+    plot(simulate(fit, drop = TRUE), main = "")
+    ```
+
+5.  Try the command
+    ```{r eval=FALSE}
+    fit2 <- kppm(redwood ~ 1, clusters="Thomas", startpar=c(kappa=10, scale=0.1))
+    ```
+    and briefly explore the fitting algorithm’s sensitivity to the
+    initial guesses at the parameter values `kappa` and `scale`.
+
+    For "large" kappa (parent intensity) and "small" scale (standard deviation), the 
+    algorithm seems quite robust:
+    ```{r}
+    kppm(redwood ~ 1, clusters="Thomas", startpar=c(kappa=10, scale=0.1))
+    kppm(redwood ~ 1, clusters="Thomas", startpar=c(kappa=100, scale=0.01))
+    ```
+
+    However, for a very small parent intensity (kappa) and large offspring scale the
+    fit changes considerably.
+    
+    ```{r}
+    kppm(redwood ~ 1, clusters="Thomas", startpar=c(kappa=0.1, scale=10))
+    ```
+
+6.  Generate and plot several simulated realisations of the fitted
+    model, to assess whether it is plausible.
+
+    ```{r}
+    XX <- simulate(fit, nsim = 11)
+    XX[[12]] <- redwood
+    plot(XX, main = "", main.panel = "")
+    ```
+    
+    The actual data do not look too different from the simulated (apart from the
+    artificial discretisation in the real data which can be seen on larger plots).
+
+7.  Extract and plot the fitted pair correlation function by
+    ```{r, eval = FALSE}
+    pcffit <- pcfmodel(fit)
+    plot(pcffit, xlim = c(0, 0.3))
+    ```
+
+    OK, let's try that:
+    
+    ```{r}
+    pcffit <- pcfmodel(fit)
+    plot(pcffit, xlim = c(0, 0.3), main = "pair correlation")
+    ```
+
+8.  Type `plot(envelope(fit, Lest, nsim=39))` to generate simulation
+    envelopes of the $L$ function from this fitted model. Do they
+    suggest the model is plausible?
+
+    ```{r}
+    plot(envelope(fit, Lest, nsim = 39, global = TRUE))
+    ```
+    
+    Yes, the model seems plausible and it does not devivate from the envelope.
+
+
+### Exercise 4
+
+1.  Fit a Matern cluster process to the `redwood` data.
+
+    We fit the Matern cluster process by specifying the `clusters` argument to
+    be `MatClust`.
+    
+    ```{r}
+    mfit <- kppm(redwood ~ 1, clusters = "MatClust")
+    ```
+
+2.  Use `vcov` to estimate the covariance matrix of the parameter estimates.
+
+    The variance (covariance matrix) is computed straightforwardly:
+
+    ```{r}
+    vcov(mfit)
+    ```
+
+3.  Compare with the covariance matrix obtained when fitting a homogeneous Poisson model.
+
+    ```{r}
+    vcov(ppm(redwood ~ 1))
+    ```
+
+    As can be seen, the variance of the intensity estimate is quite a bit larger
+    in the Matern model. This comes naturally by the doubly stochastic
+    construction of the Matern model.
