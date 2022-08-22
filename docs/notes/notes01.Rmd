@@ -2,7 +2,7 @@
 title: "Notes for session 1"
 author: "Ege Rubak (and Adrian Baddeley)"
 date: "August 2022"
-output: github_document
+output: html_document
 ---
 
 ## Introduction
@@ -200,10 +200,6 @@ Often the main objective is to study
 the "density" of points in the point pattern
 and to investigate any spatial variation in this density.
 
-```{r, echo=FALSE, results='hide'}
-library(spatstat)
-```
-
 ## Point processes
 
 In a statistical approach to data analysis, we think of the observed data
@@ -267,7 +263,6 @@ where $k(x)$ is the smoothing kernel and $e(u, v)$ is a correction for
 edge effects.
 
 ```{r}
-library(spatstat)
 plot(japanesepines)
 Z <- density(japanesepines, sigma=0.1)
 plot(Z)
