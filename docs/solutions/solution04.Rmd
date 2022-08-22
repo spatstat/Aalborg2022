@@ -1,0 +1,209 @@
+---
+title: 'Lab 4: Determinantal and Gibbs models -- solution'
+---
+
+```{r, include = FALSE}
+# This option turns evaluation of R code off in this document. Remove it
+# if you use it as a template for solving the lab exercise.
+knitr::opts_chunk$set(eval = TRUE)
+```
+
+```{r, message=FALSE}
+library(spatstat)
+```
+
+### Exercise 1
+
+In this question we fit a Strauss point process model to
+the `swedishpines` data.
+
+1.  We need a guess at the interaction distance $R$. Compute and
+    plot the $K$-function of the dataset and choose the value $r$
+    which maximises the discrepancy $|K(r)-\pi r^2|$.
+
+    We plot the above function which we want to maximize.
+
+    ```{r}
+    plot(Kest(swedishpines), abs(iso - theo) ~ r, main = "")
+    ```
+
+    As seen from the plot, the maximum lies around $r = 9$ by eye.
+    We find the optimum explicitly like follows:
+
+    ```{r}
+    discrep <- function(r) {
+      return(abs(as.function(Kest(swedishpines))(r) - pi*r^2))
+    }
+    res <- optimise(discrep, interval = c(0.1, 20), maximum = TRUE)
+    print(res)
+    R <- res$maximum
+    ```
+    
+    This corresponds nicely with the plot.
+    
+2.  Fit the stationary Strauss model with the chosen interaction
+    distance using
+    ```{r, eval = FALSE}
+    ppm(swedishpines ~ 1, Strauss(R))
+    ```
+    where `R` is your chosen value.
+    
+    As we have assigned `R`, we simply write:
+    
+    ```{r}
+    fit <- ppm(swedishpines ~ 1, Strauss(R))
+    ```
+
+3.  Interpret the printout: how strong is the interaction?
+    ```{r}
+    print(fit)
+    ```
+
+    As seen, the $\gamma = `round(exp(coef(fit)[2]), 2)$ parameter is quite small. Thus there seems to be a
+    strong negative association between points within distance R of each other.
+    A $\gamma$ of $0$ implies the hard core process whereas $\gamma = 1$ implies
+    the Poisson process and thus CSR.
+
+4.  Plot the fitted pairwise interaction function using
+    `plot(fitin(fit))`.
+
+    The pairwise interaction function become:
+    
+    ```{r}
+    plot(fitin(fit))
+    ```
+
+### Exercise 2
+
+In Question 1 we guesstimated the Strauss interaction distance 
+parameter. Alternatively this parameter could be estimated by 
+profile pseudolikelihood.
+
+1.  Look again at the plot of the $K$-function of
+    `swedishpines` and determine a plausible range of
+    possible values for the interaction distance.
+    
+    ```{r}
+    plot(Kest(swedishpines), main = "")
+    ```
+
+    A conservative range of plausible interaction distances seems to be 5 to 12 meters.
+
+2.  Generate a sequence of values equally spaced across this range,
+    for example, if your range of plausible values was
+    $[0.05, 0.3]$, then type
+    ```{r, eval = FALSE}
+    rvals <- seq(0.05, 0.3, by=0.01)
+    ```
+
+    We generate the numbers between 5 and 12.
+    ```{r}
+    rvals <- seq(5, 12, by = 0.1)
+    ```
+
+3.  Construct a data frame, with one column named `r`
+    (matching the argument name of `Strauss`), containing
+    these values. For example
+    ```{r, eval = FALSE}
+    D <- data.frame(r = rvals)
+    ```
+
+    OK, 
+    
+    ```{r}
+    D <- data.frame(r = rvals)
+    ```
+
+
+4.  Execute
+    ```{r, eval = FALSE}
+    fitp <- profilepl(D, Strauss, swedishpines ~ 1)
+    ```
+    to find the maximum profile pseudolikelihood fit.
+
+    OK, let's execute it: 
+    
+    ```{r}
+    fitp <- profilepl(D, Strauss, swedishpines ~ 1)
+    ```
+
+5.  Print and plot the object `fitp`.
+
+    ```{r}
+    print(fitp)
+    plot(fitp)
+    ```
+
+6.  Compare the computed estimate of interaction distance $r$ with
+    your guesstimate. Compare the corresponding estimates of the
+    Strauss interaction parameter $\gamma$.
+    
+    ```{r}
+    (Ropt <- reach(as.ppm(fitp)))
+    ```
+
+    The $r = `r Ropt`$ is consistent with the previous guesstimate.
+
+7.  Extract the fitted Gibbs point process model from the object
+    `fitp` as 
+    ```{r, eval = FALSE}
+    bestfit <- as.ppm(fitp)
+    ```
+
+    OK, let's do that:
+
+    ```{r}
+    bestfit <- as.ppm(fitp)
+    ```
+
+### Exercise 3
+
+Modify Question 1 by using the Huang-Ogata approximate
+maximum likelihood algorithm (`method="ho"`) instead of maximum
+pseudolikelihood (the default, `method="mpl"`).
+
+```{r}
+fit.mpl <- ppm(swedishpines ~ 1, Strauss(R), method = "mpl")
+fit.ho  <- ppm(swedishpines ~ 1, Strauss(R), method = "ho")
+print(fit.ho)
+print(fit.mpl)
+```
+
+The fits are very similar.
+
+### Exercise 4
+
+Repeat Question 2 for the inhomogeneous Strauss process with
+log-quadratic trend. The corresponding call to `profilepl` is
+```{r}
+fitp <- profilepl(D, Strauss, swedishpines ~ polynom(x,y,2))
+```
+
+```{r}
+fitp2 <- profilepl(D, Strauss, swedishpines ~ polynom(x,y,2))
+print(fitp2)
+(bestfit <- as.ppm(fitp2))
+reach(bestfit)
+```
+
+### Exercise 5
+
+- Fit a stationary Gaussian DPP model to the `swedishpines` data using the `dppm()` command.
+```{r}
+fit <- dppm(swedishpines, dppGauss())
+```
+
+- Generate 39 simulations of the fitted model (simulations may take some time to generate).
+```{r}
+sim <- simulate(fit, nsim = 39)
+```
+
+- Make pointwise envelopes for a summary statistic of your choice (e.g. `Kest()`) using the generated 39 simulations (see the `simulate` argument in `envelope.ppp()`)
+```{r}
+env <- envelope(swedishpines, Lest, simulate = sim, nsim = 39)
+```
+
+- Plot the envelopes and consider whether you find the fitted model to be reasonable.
+```{r}
+plot(env)
+```
