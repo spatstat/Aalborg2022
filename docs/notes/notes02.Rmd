@@ -269,13 +269,17 @@ bei_model <- ppm(bei ~ grad, data = bei.extra)
 coef(summary(bei_model))
 ```
 
-Are the points clustering more than expected only from dependence on `grad`?
+Are the points clustering more than expected only from log-linear dependence on `grad`?
 
+It looks like it from the pair correlation function:
 ```{r}
-Kbei_model <- Kinhom(bei, lambda = bei_model, correction = "border")
+pcf_bei_model <- pcfinhom(bei, lambda = bei_model)
+plot(pcf_bei_model)
 ```
 
+And also from the $K$-function:
 ```{r warning=FALSE}
+Kbei_model <- Kinhom(bei, lambda = bei_model, correction = "border")
 plot(Kbei_model)
 ```
 
@@ -298,8 +302,7 @@ e <- envelope(bei_model, fun = Linhom, correction = "border", nsim = 99,
 plot(e, .-r~r, ylim = c(-5, 20))
 ```
 
-Above the 99 simulations from the fitted Poisson model are generated. 
-Then `Linhom()` for these and the data using leave-one-out KDE for `lambda`.
+Above 99 simulations from the fitted Poisson model are generated and then `Linhom()` is calculated for these and the data using leave-one-out KDE for `lambda`.
 It may be more appropriate to use the intensity model (log-linear dependence on `grad`), but this is much slower. 
 The command (not executed) is (without saving intermediate data):
 ```{r eval=FALSE}
@@ -313,7 +316,7 @@ envelope(bei_model, fun = Linhom, correction = "border", nsim = 99, lambda = lam
 ```
 
 **But this is wrong** due to violation of symmetry principle between data and simulations.
-There is still another worry about the composite hypothesis, where we have used data to estimate the parameters of the model.
+There is still another worry about the composite hypothesis, where we have used data to estimate the parameters of the model, but that is yet another story...
 
 ### Simple global envelopes
 
