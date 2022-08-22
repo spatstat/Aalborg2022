@@ -1,0 +1,266 @@
+---
+title: "Notes for session 3"
+author: "Ege Rubak (and Adrian Baddeley)"
+date: "August 2022"
+---
+
+# Dependence between points
+
+Another important goal is to detect stochastic dependence between
+points in a point pattern.
+
+```{r, echo=FALSE, message=FALSE, fig.width=12, fig.height=5}
+library(spatstat)
+Xrandom <- rpoispp(50)
+Xlist <- solist(inhibition=cells,
+		random=Xrandom,
+		clustering=redwood)
+plot(Xlist, main="")		
+```
+
+* The homogeneous Poisson process is regarded as completely random
+(Complete Spatial Randomness, CSR).
+* A point process is called
+_inhibited_ if the distances between points are typically _larger_ than
+expected for a random pattern with the same intensity.
+* A point process is called _clustered_
+if the distances between points are typically _smaller_ than would be
+expected for a random pattern with the same intensity.
+
+The terms _inhibited_ and _clustered_ are analogous, respectively, to
+"negatively correlated" and "positively correlated". They do not imply
+any particular kind of stochastic dependence and they do not explain how
+the pattern was generated. 
+
+Dependence between points is sometimes called _"interaction"_, but this term
+is dangerous because it suggests a particular mechanism for the
+dependence. 
+
+## Exploratory tools
+
+### K-function
+
+The (Ripley) $K$-function assumes the point process has
+constant intensity $\lambda$. It is defined so that,
+for a typical random point in the point process,
+the number of other random points lying closer than a distance $r$
+has expected value $\lambda \, K(r)$.
+
+For a completely random (homogeneous
+Poisson) process, $K(r) = \pi r^2$. An inhibited process will usually
+have $K(r) < \pi r^2$, while a clustered process will have
+$K(r) > \pi r^2$, for appropriate values of $r$.
+
+An estimate of the $K$ function can be computed for a point pattern dataset
+`X` by typing `K <- Kest(X)`.
+
+```{r, echo=FALSE, fig.height=3, fig.width=9.5, result.width='100%'}
+Klist <- anylapply(Xlist, Kest)
+plot(Klist, main="")
+```
+
+### pair correlation function
+
+The pair correlation function $g(r)$ can be defined as
+$g(r) = K^\prime(r)/(2\pi r)$ where $K^\prime(r)$ is the derivative
+of the $K$ function. The pair correlation function
+can be interpreted as the probability that two points in the point process
+will be separated by a distance equal to $r$, normalised by the corresponding
+probability for a completely random (Poisson) process.
+
+For a completely random (homogeneous
+Poisson) process, $g(r) = 1$. An inhibited process will usually
+have $g(r) < 1$, while a clustered process will have
+$g(r) > 1$, for appropriate values of $r$.
+
+An estimate of the pair correlation function
+can be computed for a point pattern dataset
+`X` by typing `g <- pcf(X)`.
+
+```{r, echo=FALSE, fig.height=3, fig.width=9.5, result.width='100%'}
+glist <- anylapply(Xlist, pcf)
+plot(glist, main="")
+```
+
+## Explicit Models for clustered data
+
+```{r}
+plot(redwood)
+```
+
+### Cluster processes
+
+A cluster process is generated in two stages.
+
+1. a point pattern of _"parent"_ points $X$ is generated;
+2. around each parent point $x_i$, a finite pattern of _"offspring"_
+points $y_{i1}, \ldots, y_{in_i}$ is generated;
+3. the offspring of all parents are collected together into a
+single point pattern $Y$.
+
+In a _Thomas cluster process_,
+
+1. the parents are a homogeneous Poisson process with intensity $\kappa$;
+2. each parent has a Poisson number (with mean $\mu$) of offspring,
+which are displaced from the parent by independent Gaussian vectors
+with standard deviation $\sigma$.
+
+Here are simulated realisations of a Thomas process:
+
+```{r, result.width='100%'}
+plot(rThomas(kappa=10, sigma=0.2, mu=5, nsim=12),
+     main="", main.panel="")
+```
+
+Maximum likelihood fitting of cluster processes is difficult because
+the likelihood is quite complicated. However, 
+the $K$-function of such cluster processes is known analytically,
+so the model can be fitted by the method of moments (matching the
+model's theoretical $K$-function to the empirical $K$-function of the
+data). This is performed by the `spatstat` function `kppm`.
+
+```{r}
+fitT <- kppm(redwood ~ 1, "Thomas")
+fitT
+```
+
+```{r}
+plot(simulate(fitT, nsim=12))
+```
+
+```{r}
+kppm(redwood ~ x+y, "Thomas")
+```
+
+### Cox processes
+
+A _Cox process_ is formed in two steps:
+
+1. a random function $\Lambda(u)$ is generated;
+2. Given the realisation of the random function,
+a Poisson point process is generated with intensity function $\Lambda(u)$.
+
+In a _log-Gaussian Cox process_, the random function $\Lambda(u)$
+is such that $\log \Lambda(u)$ is a Gaussian random function.
+
+These models can be fitted by the same technique:
+
+```{r}
+kppm(redwood ~ x+y, "LGCP")
+```
+
+## Checking for dependence between points
+
+Example of Poisson model for `bei` data:
+```{r}
+bei_model <- ppm(bei ~ grad, data = bei.extra)
+coef(summary(bei_model))
+```
+
+Are the points clustering more than expected only from log-linear dependence on `grad`?
+
+It looks like it from the pair correlation function:
+```{r}
+pcf_bei_model <- pcfinhom(bei, lambda = bei_model)
+plot(pcf_bei_model)
+```
+
+And also from the $K$-function:
+```{r warning=FALSE}
+Kbei_model <- Kinhom(bei, lambda = bei_model, correction = "border")
+plot(Kbei_model)
+```
+
+Often central $L$-function is used:
+
+```{r warning=FALSE}
+plot(Kbei_model, sqrt(./pi)-r ~ r)
+```
+
+### Pointwise significance envelopes
+
+Monte Carlo significance envelopes for a **pointwise** test:
+
+```{r warning=FALSE}
+e <- envelope(bei_model, fun = Linhom, correction = "border", nsim = 99,
+              savefuns = TRUE, savepatterns = TRUE)
+```
+
+```{r}
+plot(e, .-r~r, ylim = c(-5, 20))
+```
+
+Above 99 simulations from the fitted Poisson model are generated and then `Linhom()` is calculated for these and the data using leave-one-out KDE for `lambda`.
+It may be more appropriate to use the intensity model (log-linear dependence on `grad`), but this is much slower. 
+The command (not executed) is (without saving intermediate data):
+```{r eval=FALSE}
+envelope(bei_model, fun = Linhom, correction = "border", nsim = 99, lambda = bei_model)
+```
+
+It may be tempting to use the faster:
+```{r eval=FALSE}
+lam <- predict(bei_model, at = "points")
+envelope(bei_model, fun = Linhom, correction = "border", nsim = 99, lambda = lam)
+```
+
+**But this is wrong** due to violation of symmetry principle between data and simulations.
+There is still another worry about the composite hypothesis, where we have used data to estimate the parameters of the model, but that is yet another story...
+
+### Simple global envelopes
+
+Adding `global = TRUE` and setting `ginterval` gives us simple global *fixed width* envelopes:
+```{r}
+e_global <- envelope(e, global = TRUE, ginterval = c(0,125))
+```
+
+```{r}
+plot(e_global, .-r~r)
+```
+
+### Global rank envelopes
+
+More sophisticated global envelopes are available in the R package `GET` (see references therein for details).
+```{r}
+library(GET)
+```
+
+These envelopes are calculated based on a global ranking of the data curve in the set of curves calculated from simulations and data.
+Each curve has a global rank based on the most extreme pointwise rank it has acheived.
+Many curves typically have the same rank so ties need to be broken which can be done in various ways.
+Due to the ties many simulations are recommended (e.g. 1999).
+The package `GET` can reuse `envelope` objects from `spatstat` if intermediate calculations (simulations and function values) have been saved:
+```{r}
+bei_test <- global_envelope_test(e)
+```
+
+```{r}
+plot(bei_test)
+```
+
+The test both gives a p-value and a graphical interpretation significance envelopes at the $\alpha$-level.
+If the data curve ever exits these envelopes the test is significant at the $\alpha$-level (and vice-versa). 
+Values leading to the rejection of the null hypothesis (at the default $\alpha=0.05$ level) are marked by red.
+
+An example from the package vignettes testing a simple hypothesis:
+```{r}
+X <- unmark(spruces)
+plot(X, main = "")
+```
+
+```{r}
+nsim <- 1999 # Number of simulations
+env <- envelope(X, fun = "Lest", nsim = nsim,
+                savefuns = TRUE, # save the functions
+                correction = "translate", # edge correction for L
+                transform = expression(.-r), # centering
+                simulate = expression(runifpoint(ex = X)), # Simulate CSR
+                verbose = FALSE)
+res <- global_envelope_test(env, type = "erl")
+plot(res)
+```
+
+```{r}
+cset <- crop_curves(env, r_min = 1, r_max = 7)
+res <- global_envelope_test(cset, type = "erl")
+plot(res)
+```

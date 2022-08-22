@@ -1,0 +1,108 @@
+---
+title: "Notes for session 4"
+author: "Ege Rubak (and Adrian Baddeley)"
+date: "August 2022"
+---
+
+# Determinantal and Gibbs models
+
+## Models for inhibited data
+
+```{r message=FALSE}
+library(spatstat)
+plot(cells)
+```
+
+```{r}
+jp <- residualspaper$Fig1
+plot(jp)
+```
+
+### Determinantal point process models
+
+Determinantal point process models are a relatively new class of models
+with many attractive theoretical properties.
+
+These models can be fitted in `spatstat` using the function `dppm`.
+
+```{r}
+dppm(jp ~ x+y, dppGauss)
+```
+
+```{r}
+fit <- dppm(jp ~ polynom(x,y,2),
+            dppMatern,
+	    statistic="pcf", statargs=list(stoyan=0.2))
+plot(predict(fit))	    
+```
+
+```{r}
+plot(simulate(fit))
+```
+
+### Gibbs models
+
+Gibbs models were developed in theoretical physics to describe the
+behaviour of molecular gases. A point pattern $x$ represents a
+spatial configuration of molecules.
+The probability of a particular configuration $x$ is
+$$
+    p(x) = Z \exp(- U(x))
+$$
+where $U(x)$ is the potential energy of the configuration,
+and $Z$ is a normalising constant. In fact $p(x)$ is a probability density
+relative to the completely random (homogeneous Poisson) point process.
+
+To visualise this, imagine that we first generate an infinite "ensemble"
+of realisations of the homogeneous Poisson process. Then each realisation
+is either deleted or retained (in its entirety)
+depending on its potential energy;
+a realisation $x$ is retained with probability $\exp(-U(x))$.
+Then what remains is an ensemble of realisations of the Gibbs process.
+
+The simplest example is the _hard core process_ in which the points represent
+the centres of discs of diameter $d$ which cannot overlap. A realisation $x$
+has potential energy $U(x) = -\infty$ if any pair of points in $x$ lies closer
+than distance $d$; otherwise it has potential $U(x) = 0$.
+Now generate an infinite ensemble of realisations of the Poisson process.
+Then delete any configuration which contains a pair of points
+closer than distance $d$. The remaining realisations are an ensemble
+of realisations of the hard core process.
+
+Gibbs models can be fitted to point pattern data
+by maximising Besag's _pseudolikelihood_. This is performed by `ppm`.
+
+```{r}
+ppm(cells~ 1, Hardcore())
+```
+
+```{r}
+minnndist(cells)
+```
+
+```{r}
+ppm(cells ~ 1, Strauss(0.1))
+```
+
+```{r}
+fit <- ppm(cells ~ 1, Strauss(0.1))
+plot(simulate(fit, nsim=4))
+```
+
+
+```{r}
+plot(pcfinhom(jp))
+```
+
+```{r}
+minnndist(jp)
+```
+
+```{r}
+ppm(jp ~ x+y, Strauss(0.2))
+```
+
+```{r}
+ppm(jp ~ x+y, Strauss(0.5))
+```
+
