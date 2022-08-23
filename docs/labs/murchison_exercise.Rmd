@@ -1,0 +1,63 @@
+---
+title: 'Hand-in exercise: Murchison data'
+---
+
+```{r, message=FALSE}
+library(spatstat)
+```
+
+In this exercise we work with the `spatstat` dataset `murchison` rescaled to km
+(applying `rescale` to a spatial object list (`solist`)):
+```{r}
+mur <- solapply(murchison, rescale, s = 1000, unitname = "km")
+```
+
+### Exercise 1
+
+Read the help file for `murchison` (in `spatstat.data`) and reproduce the plot given in the *Examples* section of the help file.
+
+### Exercise 2
+
+Add the distance to the neareast fault line to the spatial object list `mur`:
+```{r}
+mur$dfault <- distfun(mur$faults)
+```
+
+Now, consider the Poisson model:
+```{r}
+model_d <- ppm(gold ~ dfault, data = mur)
+model_d
+```
+
+Write the estimated intensity function $\hat\lambda(u)$ as a function of the distance to the nearest fault, $D(u)$, with the parameter values inserted.
+
+### Exercise 3
+
+Consider the model 
+```{r}
+model_g <- ppm(gold ~ greenstone, data = mur)
+model_g
+```
+
+- What does this model state about the intensity function? (*Hint:* the plot you produce below may be helpful.)
+
+- Use `predict.ppm()` to calculate the estimated intensity function and plot it.
+
+### Exercise 4
+
+Consider the model 
+```{r}
+model_dg <- ppm(gold ~ dfault + greenstone, data = mur)
+model_dg
+```
+and write down $\hat\lambda(u)$ as a function of the distance to the nearest fault, $D(u)$, and the greenstone indicator function
+$$
+G(u) = 1\{u \, \text{ in greenstone area}\}
+$$
+with the parameter values inserted.
+
+### Exercise 5
+
+Fit a cluster model of your choice to the `mur` data with the same intensity model using `kppm(gold ~ dfault + greenstone, ..., data = mur)`.
+
+Compare the standard errors obtained for this cluster model with the standard errors for the Poisson model `model_dg`.
