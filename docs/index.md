@@ -77,8 +77,8 @@ Thursday consists of four lectures
 
 ### Hand-in exercises for Thursday
 
-- _One_ of the exercises at slide 11, 18, 19, 30 or 43 in lecture_spheres_no_pause.pdf should be handed in to Jesper (jm@math.aau.dk).
-- _One_ of the exercises at slide 20 or 43 in lecture_networks_no_pause.pdf should be handed in to Jesper (jm@math.aau.dk).
+- _One_ of the exercises at slide 11, 18, 19, 30 or 44 in lecture_spheres_no_pause.pdf should be handed in to Jesper (jm@math.aau.dk).
+- _One_ of the exercises at slide 23 or 44 in lecture_networks_no_pause.pdf should be handed in to Jesper (jm@math.aau.dk).
 - _One_ of the exercises at slide 5, 10 or 15 in dln-slides.pdf should be handed in to Jakob (jgr@math.aau.dk).
 
 ### Optional reading for Thursday
