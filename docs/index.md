@@ -102,6 +102,15 @@ This will be illustrated with applications in spatial statistics to assess the g
 
 The session will be accompanied by tutorials and exercices with the R package TDA.
 
+### Material for the session
+
+Please find below the slides and codes reviewed during the course. Please do not hesitate to send me an email if you have any questions.
+
+- [TDA_Exercices_session.pdf](./labs/TDA_Exercices_session.pdf)
+- [TDA_Lecture1_part1.pdf](./notes/TDA_Lecture1_part1.pdf)
+- [TDA_Lecture1_part2.pdf](./notes/TDA_Lecture1_part2.pdf)
+- [Lecture1_Tutorial_TDA.html](./notes/Lecture1_Tutorial_TDA.html)
+
 ### Hand-in exercises for Friday
 
 - Your solution to [this exercise](./notes/TDAexercise.pdf) should be handed in to Christophe (christophe@math.aau.dk).
